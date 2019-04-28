@@ -12,6 +12,6 @@ lex pattern.l
 
 cc lex.yy.c y.tab.c compiler.c -o compiler.out
 
-./cmpiler.out
+./compiler.out
 
 The source code is provided in myProgram.txt
