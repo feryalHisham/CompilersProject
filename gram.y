@@ -146,8 +146,8 @@ void freeNode(nodeType *p) {
 }
 
 void yyerror(char *s) {
-    fprintf(stdout, "%s\n", s);
-    //fprintf(stderr, "line %d: %s\n", yylineno, s);
+    //fprintf(stdout, "%s\n", s);
+    fprintf(stdout, "line %d: %s\n", yylineno, s);
 }
 int main(void) {
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
