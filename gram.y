@@ -7,7 +7,7 @@
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(int i);
-nodeType *con(int value);
+nodeType *con(varTypeEnum type,char* value);
 void freeNode(nodeType *p);
 int ex(nodeType *p);
 int yylex(void);
@@ -26,9 +26,10 @@ int sym[26];                    /* symbol table */
     nodeType *nPtr;             /* node pointer */
 };
 
-%token <iValue> INTEGER
+//%token <iValue> INTEGER
+//%token <fValue> FLOAT
 %token <sIndex> VARIABLE
-%token <sValue> STRING
+%token <sValue> STRING INTEGER FLOAT
 %token WHILE IF PRINT
 %nonassoc IFX
 %nonassoc ELSE
@@ -55,7 +56,7 @@ stmt:
           ';'                            { $$ = opr(';', 2, NULL, NULL); }
         | expr ';'                       { $$ = $1; }
         | PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
-        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1), $3); }
+        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1), $3);}
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
         | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
         | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }
@@ -68,7 +69,8 @@ stmt_list:
         ;
 
 expr:
-          INTEGER               { $$ = con($1); }
+          INTEGER               { $$ = con(Integer,$1); }
+        |  FLOAT                { $$ = con(Float,$1); }
         | VARIABLE              { $$ = id($1); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
@@ -86,7 +88,7 @@ expr:
 
 %%
 
-nodeType *con(int value) {
+nodeType *con(varTypeEnum type,char* value) {
     nodeType *p;
 
     /* allocate node */
@@ -95,6 +97,7 @@ nodeType *con(int value) {
 
     /* copy information */
     p->type = typeCon;
+    p->con.type = type;
     p->con.value = value;
 
     return p;

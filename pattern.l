@@ -19,15 +19,20 @@ void yyerror(char *);
             }
 
 [1-9][0-9]* {
-                yylval.iValue = atoi(yytext);
+                yylval.sValue = yytext ;   //atoi(yytext);
                 return INTEGER;
             }
+[0-9]+(\.)([0-9]+) 		{
+								yylval.sValue= yytext ; //atof(yytext);
+								return FLOAT;
+							}
 
 [-()<>=+*/;{}.] {
                 return *yytext;
              }
-\"[^"\n]*["\n] {
-             								yylval.sValue = strdup(yytext+1);
+\"[^"\n]*\" {
+             								yylval.sValue = strdup(yytext);
+             								//printf("found %s\n", yylval.sValue);
              								return STRING;
              								}
 

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "typesStructs.h"
 #include "y.tab.h"
 
@@ -9,8 +10,16 @@ int ex(nodeType *p) {
 
     if (!p) return 0;
     switch(p->type) {
-    case typeCon:       
-        printf("\tpush\t%d\n", p->con.value); 
+    case typeCon:
+        switch (p->con.type){
+            case Integer:
+                printf("\tpush\t%d\n", atoi(p->con.value));
+                break;
+            case Float:
+                printf("\tpush\t%f\n", atof(p->con.value));
+                break;
+        }
+
         break;
     case typeId:        
         printf("\tpush\t%c\n", p->id.i + 'a'); 
@@ -48,7 +57,8 @@ int ex(nodeType *p) {
             break;
         case '=':       
             ex(p->opr.op[1]);
-            printf("\tpop\t%c\n", p->opr.op[0]->id.i + 'a');
+            sym[p->opr.op[0]->id.i] =  atoi(p->opr.op[1]->con.value);
+            printf("\tpop\t%c\twith value%d\n", p->opr.op[0]->id.i + 'a',sym[p->opr.op[0]->id.i]);
             break;
         case UMINUS:    
             ex(p->opr.op[0]);
