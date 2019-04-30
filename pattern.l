@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "typesStructs.h"
 #include "y.tab.h"
-int yylineno;
+//int yylineno;
 void yyerror(char *);
 %}
 

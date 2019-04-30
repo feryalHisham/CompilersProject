@@ -16,6 +16,7 @@ int ex(nodeType *p) {
         printf("\tpush\t%c\n", p->id.i + 'a'); 
         break;
     case typeOpr:
+    	// fprintf(stdout, "type %d %c \n", p->exType,p->opr.oper);
         switch(p->opr.oper) {
         case WHILE:
             printf("L%03d:\n", lbl1 = lbl++);
