@@ -1,15 +1,15 @@
 %{
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include "typesStructs.h"
 
 
+
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(int i);
-nodeType *con(int value);
+nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
 void freeNode(nodeType *p);
 int ex(nodeType *p);
 int yylex(void);
@@ -26,13 +26,16 @@ int sym[26];                    /* symbol table */
     char sIndex;                /* symbol table index */
     char* sValue;               /* string value */
     float fValue;               /* float value */
+	bool bValue;
     nodeType *nPtr;             /* node pointer */
 };
 
 %token <iValue> INTEGER
-%token <sIndex> VARIABLE
 %token <sValue> STRING
-%token WHILE IF PRINT
+%token <fValue> FLOAT
+%token <bValue> BOOL
+%token <sIndex> VARIABLE
+%token WHILE IF PRINT INT_TYPE FLOAT_TYPE STRING_TYPE BOOL_TYPE
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -43,7 +46,7 @@ int sym[26];                    /* symbol table */
 %left '*' '/'
 %nonassoc UMINUS
 
-%type <nPtr> stmt expr stmt_list
+%type <nPtr> stmt declaration expr stmt_list
 
 %%
 
@@ -57,6 +60,8 @@ function:
         ;
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
+        | declaration                  { $$ = $1; }
+		| declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1), $3); }
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
         | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
@@ -69,8 +74,22 @@ stmt_list:
         | stmt_list stmt        { $$ = opr(';', 2, $1, $2); }
         ;
 
+declaration:  
+			 INT_TYPE VARIABLE     { $$ = id($2);}
+			| INT_TYPE VARIABLE ';' { $$ = id($2);}
+			| FLOAT_TYPE VARIABLE { $$ = id($2);}
+			| FLOAT_TYPE VARIABLE ';' { $$ = id($2);}
+			| STRING_TYPE VARIABLE { $$ = id($2);}
+			| STRING_TYPE VARIABLE ';' { $$ = id($2);}
+			| BOOL_TYPE VARIABLE { $$ = id($2);}
+			| BOOL_TYPE VARIABLE ';' { $$ = id($2);}
+	          ;     
+
 expr:
-          INTEGER               { $$ = con($1); }
+          INTEGER               { $$ = con($1, 0.0, "", true, typeInt); }
+		| FLOAT 				{ $$ = con(0, $1, "", true, typeFloat); }
+		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
+		| BOOL					{ $$ = con(0, 0.0, "", $1, typeBool); }
         | VARIABLE              { $$ = id($1); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
@@ -88,17 +107,32 @@ expr:
 
 %%
 
-nodeType *con(int value) {
-    nodeType *p;
-
+nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
+     nodeType *p;
+    
     /* allocate node */
     if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
 
     /* copy information */
     p->type = typeCon;
-    p->con.value = value;
     p->exType = typeOther;
+    p->con.conT=conT;	
+  
+    switch(conT){
+		case typeInt:
+			p->con.valueInt = valI;
+		break;
+		case typeFloat:
+			p->con.valueFloat = valF;
+		break;
+		case typeString:
+			p->con.valueString = valS;
+		break;
+		default:
+			p->con.valueBool = valB;
+    }
+
     return p;
 }
 
@@ -145,7 +179,7 @@ nodeType *opr(int oper, int nops, ...) {
 	{
     	for (i = 0; i < nops; i++)
 	   if(p->opr.op[i]->exType == typeLog)
-		yyerror("can't include non Mathmatical expression.");
+		yyerror("Can't include non Mathmatical expression.");
 	}
 
     va_end(ap);
@@ -168,6 +202,9 @@ void yyerror(char *s) {
     fprintf(stdout, "line %d: %s\n", yylineno, s);
     exit(0);
 }
+
+
+
 int main(void) {
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();

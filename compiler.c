@@ -9,8 +9,20 @@ int ex(nodeType *p) {
 
     if (!p) return 0;
     switch(p->type) {
-    case typeCon:       
-        printf("\tpush\t%d\n", p->con.value); 
+    case typeCon: 
+		switch(p->con.conT){
+		case typeInt:
+			printf("\tpush\t%d\n", p->con.valueInt); 
+		break;
+		case typeFloat:
+			printf("\tpush\t%f\n", p->con.valueFloat); 
+		break;
+		case typeString:
+			printf("\tpush\t%s\n", p->con.valueString); 
+		break;
+		default:
+			printf("\tpush\t%d\n", p->con.valueBool); 
+        }      
         break;
     case typeId:        
         printf("\tpush\t%c\n", p->id.i + 'a'); 

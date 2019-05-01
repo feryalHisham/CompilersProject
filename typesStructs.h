@@ -1,9 +1,19 @@
+
+
+#include <stdbool.h>
+
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 typedef enum { typeLog,typeMath,typeOther } exprType;
-
+typedef enum { typeInt,typeFloat,typeString,typeBool} conType;
 /* constants */
 typedef struct {
-    int value;                  /* value of constant */
+ conType conT;
+ union {
+    int valueInt;                  /* value of constant */
+    char* valueString;
+    float valueFloat;
+    bool valueBool;
+   };
 } conNodeType;
 
 

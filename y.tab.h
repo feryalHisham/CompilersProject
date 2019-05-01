@@ -46,34 +46,46 @@ extern int yydebug;
   enum yytokentype
   {
     INTEGER = 258,
-    VARIABLE = 259,
-    STRING = 260,
-    WHILE = 261,
-    IF = 262,
-    PRINT = 263,
-    IFX = 264,
-    ELSE = 265,
-    GE = 266,
-    LE = 267,
-    EQ = 268,
-    NE = 269,
-    UMINUS = 270
+    STRING = 259,
+    FLOAT = 260,
+    BOOL = 261,
+    VARIABLE = 262,
+    WHILE = 263,
+    IF = 264,
+    PRINT = 265,
+    INT_TYPE = 266,
+    FLOAT_TYPE = 267,
+    STRING_TYPE = 268,
+    BOOL_TYPE = 269,
+    IFX = 270,
+    ELSE = 271,
+    GE = 272,
+    LE = 273,
+    EQ = 274,
+    NE = 275,
+    UMINUS = 276
   };
 #endif
 /* Tokens.  */
 #define INTEGER 258
-#define VARIABLE 259
-#define STRING 260
-#define WHILE 261
-#define IF 262
-#define PRINT 263
-#define IFX 264
-#define ELSE 265
-#define GE 266
-#define LE 267
-#define EQ 268
-#define NE 269
-#define UMINUS 270
+#define STRING 259
+#define FLOAT 260
+#define BOOL 261
+#define VARIABLE 262
+#define WHILE 263
+#define IF 264
+#define PRINT 265
+#define INT_TYPE 266
+#define FLOAT_TYPE 267
+#define STRING_TYPE 268
+#define BOOL_TYPE 269
+#define IFX 270
+#define ELSE 271
+#define GE 272
+#define LE 273
+#define EQ 274
+#define NE 275
+#define UMINUS 276
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -86,9 +98,10 @@ union YYSTYPE
     char sIndex;                /* symbol table index */
     char* sValue;               /* string value */
     float fValue;               /* float value */
+	bool bValue;
     nodeType *nPtr;             /* node pointer */
 
-#line 92 "y.tab.h" /* yacc.c:1909  */
+#line 105 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

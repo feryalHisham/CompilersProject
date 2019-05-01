@@ -22,14 +22,28 @@ void yyerror(char *);
                 yylval.iValue = atoi(yytext);
                 return INTEGER;
             }
+[0-9]+(\.)[0-9]+ {
+
+		yylval.fValue= atof(yytext);
+		return FLOAT;
+		}
+"True" {
+
+		yylval.bValue= true;
+		return BOOL;
+		}
+"False" {
+		yylval.bValue= false;
+		return BOOL;
+		}
 
 [-()<>=+*/;{}.] {
                 return *yytext;
              }
 \"[^"\n]*["\n] {
-             								yylval.sValue = strdup(yytext+1);
-             								return STRING;
-             								}
+		yylval.sValue = strdup(yytext);
+		return STRING;
+		}
 
 ">="            return GE;
 "<="            return LE;
@@ -39,6 +53,11 @@ void yyerror(char *);
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;
+
+"int"           return INT_TYPE;
+"float"         return FLOAT_TYPE;
+"string"	return STRING_TYPE;
+"bool" 		return BOOL_TYPE;
 
 [ \t]+ 	;			/* ignore whitespace */
 [\n]			{++yylineno;}
