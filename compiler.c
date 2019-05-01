@@ -24,8 +24,9 @@ int ex(nodeType *p) {
 			printf("\tpush\t%d\n", p->con.valueBool); 
         }      
         break;
-    case typeId:        
-        printf("\tpush\t%c\n", p->id.i + 'a'); 
+    case typeId: 
+	//fprintf(stdout, "line %s\n", p->id.keyName);       
+        printf("\tpush\t%s\n", p->id.keyName); 
         break;
     case typeOpr:
     	// fprintf(stdout, "type %d %c \n", p->exType,p->opr.oper);
@@ -61,7 +62,7 @@ int ex(nodeType *p) {
             break;
         case '=':       
             ex(p->opr.op[1]);
-            printf("\tpop\t%c\n", p->opr.op[0]->id.i + 'a');
+            printf("\tpop\t%s\n", p->opr.op[0]->id.keyName );
             break;
         case UMINUS:    
             ex(p->opr.op[0]);

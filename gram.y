@@ -8,7 +8,7 @@
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
-nodeType *id(int i);
+nodeType *id(char *s,int vType);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
 void freeNode(nodeType *p);
 int ex(nodeType *p);
@@ -18,7 +18,8 @@ int yylex(void);
 FILE * yyin; // input file for lex
 FILE * stderr;  // for logging errors
 void yyerror(char *s);
-int sym[26];                    /* symbol table */
+varData sym[100][50];                    /* symbol table */
+int noOfScopes;
 %}
 
 %union {
@@ -26,16 +27,16 @@ int sym[26];                    /* symbol table */
     char sIndex;                /* symbol table index */
     char* sValue;               /* string value */
     float fValue;               /* float value */
-	bool bValue;
+    bool bValue;
     nodeType *nPtr;             /* node pointer */
 };
 
-%token <iValue> INTEGER
+%token <iValue> INTEGER INT_TYPE FLOAT_TYPE STRING_TYPE BOOL_TYPE
 %token <sValue> STRING
 %token <fValue> FLOAT
 %token <bValue> BOOL
-%token <sIndex> VARIABLE
-%token WHILE IF PRINT INT_TYPE FLOAT_TYPE STRING_TYPE BOOL_TYPE
+%token <sValue> VARIABLE
+%token WHILE IF PRINT 
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -61,8 +62,8 @@ function:
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration                  { $$ = $1; }
-		| declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
-        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1), $3); }
+	| declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
+        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,1), $3); }
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
         | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
         | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }
@@ -75,14 +76,14 @@ stmt_list:
         ;
 
 declaration:  
-			 INT_TYPE VARIABLE     { $$ = id($2);}
-			| INT_TYPE VARIABLE ';' { $$ = id($2);}
-			| FLOAT_TYPE VARIABLE { $$ = id($2);}
-			| FLOAT_TYPE VARIABLE ';' { $$ = id($2);}
-			| STRING_TYPE VARIABLE { $$ = id($2);}
-			| STRING_TYPE VARIABLE ';' { $$ = id($2);}
-			| BOOL_TYPE VARIABLE { $$ = id($2);}
-			| BOOL_TYPE VARIABLE ';' { $$ = id($2);}
+			 INT_TYPE VARIABLE     { $$ = id($2,$1);}
+			| INT_TYPE VARIABLE ';' { $$ = id($2,$1);}
+			| FLOAT_TYPE VARIABLE { $$ = id($2,$1);}
+			| FLOAT_TYPE VARIABLE ';' { $$ = id($2,$1);}
+			| STRING_TYPE VARIABLE { $$ = id($2,$1);}
+			| STRING_TYPE VARIABLE ';' { $$ = id($2,$1);}
+			| BOOL_TYPE VARIABLE { $$ = id($2,$1);}
+			| BOOL_TYPE VARIABLE ';' { $$ = id($2,$1);}
 	          ;     
 
 expr:
@@ -90,7 +91,7 @@ expr:
 		| FLOAT 				{ $$ = con(0, $1, "", true, typeFloat); }
 		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
 		| BOOL					{ $$ = con(0, 0.0, "", $1, typeBool); }
-        | VARIABLE              { $$ = id($1); }
+        | VARIABLE              { $$ = id($1,1); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
         | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
@@ -136,17 +137,25 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
     return p;
 }
 
-nodeType *id(int i) {
+nodeType *id(char *s,int vType) {
     nodeType *p;
+
 
     /* allocate node */
     if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
-
+    
     /* copy information */
     p->type = typeId;
-    p->id.i = i;
+    p->id.keyName = s;
+    p->id.scopeIndex = noOfScopes;
+    p->id.varIndex = ++sym[noOfScopes][0].valueInt;
     p->exType = typeOther;
+    
+    varData var;
+    var.varType=vType;
+    var.varName=s;
+    sym[p->id.scopeIndex][p->id.varIndex] = var;
     return p;
 }
 
@@ -204,8 +213,8 @@ void yyerror(char *s) {
 }
 
 
-
 int main(void) {
+    noOfScopes=1;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
     fclose(yyin);

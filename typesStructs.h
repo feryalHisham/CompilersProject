@@ -1,5 +1,3 @@
-
-
 #include <stdbool.h>
 
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
@@ -19,7 +17,9 @@ typedef struct {
 
 /* identifiers */
 typedef struct {
-    int i;                      /* subscript to sym array */
+    char* keyName;                      /* subscript to sym array */
+    int scopeIndex;
+    int varIndex;
 } idNodeType;
 
 /* operators */
@@ -39,5 +39,21 @@ typedef struct nodeTypeTag {
     };
 } nodeType;
 
-extern int sym[26];
+typedef struct {
+	conType varType;
+  	char* varName;
+	bool constant;
+	 union {
+    int valueInt;                  /* value of constant */
+    char* valueString;
+    float valueFloat;
+    bool valueBool;
+   };	
+} varData;
+
+extern int noOfScopes;
+extern int scopesParent[100];	/* start from index 1*/
+extern varData sym[100][50]; /* first index contains the number of variables in this scope*/
 extern int yylineno;
+
+

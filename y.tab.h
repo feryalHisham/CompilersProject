@@ -46,17 +46,17 @@ extern int yydebug;
   enum yytokentype
   {
     INTEGER = 258,
-    STRING = 259,
-    FLOAT = 260,
-    BOOL = 261,
-    VARIABLE = 262,
-    WHILE = 263,
-    IF = 264,
-    PRINT = 265,
-    INT_TYPE = 266,
-    FLOAT_TYPE = 267,
-    STRING_TYPE = 268,
-    BOOL_TYPE = 269,
+    INT_TYPE = 259,
+    FLOAT_TYPE = 260,
+    STRING_TYPE = 261,
+    BOOL_TYPE = 262,
+    STRING = 263,
+    FLOAT = 264,
+    BOOL = 265,
+    VARIABLE = 266,
+    WHILE = 267,
+    IF = 268,
+    PRINT = 269,
     IFX = 270,
     ELSE = 271,
     GE = 272,
@@ -68,17 +68,17 @@ extern int yydebug;
 #endif
 /* Tokens.  */
 #define INTEGER 258
-#define STRING 259
-#define FLOAT 260
-#define BOOL 261
-#define VARIABLE 262
-#define WHILE 263
-#define IF 264
-#define PRINT 265
-#define INT_TYPE 266
-#define FLOAT_TYPE 267
-#define STRING_TYPE 268
-#define BOOL_TYPE 269
+#define INT_TYPE 259
+#define FLOAT_TYPE 260
+#define STRING_TYPE 261
+#define BOOL_TYPE 262
+#define STRING 263
+#define FLOAT 264
+#define BOOL 265
+#define VARIABLE 266
+#define WHILE 267
+#define IF 268
+#define PRINT 269
 #define IFX 270
 #define ELSE 271
 #define GE 272
@@ -92,13 +92,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 24 "gram.y" /* yacc.c:1909  */
+#line 25 "gram.y" /* yacc.c:1909  */
 
     int iValue;                 /* integer value */
     char sIndex;                /* symbol table index */
     char* sValue;               /* string value */
     float fValue;               /* float value */
-	bool bValue;
+    bool bValue;
     nodeType *nPtr;             /* node pointer */
 
 #line 105 "y.tab.h" /* yacc.c:1909  */
