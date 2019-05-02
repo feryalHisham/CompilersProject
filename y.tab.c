@@ -1791,9 +1791,9 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 
 
     /* allocate node */
-    //if ((p = malloc(sizeof(nodeType))) == NULL)
-      //  yyerror("out of memory");
-    p = new nodeType;
+    if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
+        yyerror("out of memory");
+    //p = new nodeType;
     /* copy information */
     p->type = typeCon;
     p->exType = typeOther;
@@ -1813,7 +1813,7 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 			p->con.valueBool = valB;
     }
 
-    printf("con\n");
+    // printf("con\n");
 
 
     return p;
@@ -1823,9 +1823,9 @@ nodeType *id(char *s,conType vType) {
     nodeType *p;
 
     /* allocate node */
-    //if ((p = malloc(sizeof(nodeType))) == NULL)
-      //  yyerror("out of memory");
-    p = new nodeType;
+    if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
+        yyerror("out of memory");
+    // p = new nodeType;
     //scopesParent[scopeLevel] = scopeLevel-1;
 
     varData *existVar = findVar(s,scopeLevel);
@@ -1854,7 +1854,7 @@ nodeType *id(char *s,conType vType) {
         sym[scopeLevel][0].valueInt++;
     }
 
-    printf("id\n");
+    //printf("id\n");
 
     return p;
 }
@@ -1865,9 +1865,9 @@ nodeType *opr(int oper, int nops, ...) {
     int i;
 
     /* allocate node, extending op array */
-    //if ((p = malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
-      //  yyerror("out of memory");
-    p = new nodeType;
+    if ((p = (nodeType *)malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
+        yyerror("out of memory");
+    //p = new nodeType;
     /* copy information */
     p->type = typeOpr;
     p->opr.oper = oper;
@@ -1893,7 +1893,7 @@ nodeType *opr(int oper, int nops, ...) {
 	}
 
     va_end(ap);
-    printf("opr\n");
+    //printf("opr\n");
     return p;
 }
 
@@ -1910,13 +1910,13 @@ void freeNode(nodeType *p) {
 
 void yyerror(std::string s) {
     //fprintf(stdout, "%s\n", s);
-    //fprintf(stdout, "line %d: %s\n", yylineno, s);
+    fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
     exit(0);
 }
 
 varData *findVar(char* varName, int scopeIndex){
 
-    printf("var name %s scope %d vars %d\n",varName,scopeIndex,sym[scopeIndex][0].valueInt);
+    //printf("var name %s scope %d vars %d\n",varName,scopeIndex,sym[scopeIndex][0].valueInt);
     if(scopeIndex == 0)
         return NULL;
 
