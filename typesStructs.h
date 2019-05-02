@@ -3,7 +3,7 @@
 #define MAX_VARS 50
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 typedef enum { typeLog,typeMath,typeOther } exprType;
-typedef enum { typeInt,typeFloat,typeString,typeBool} conType;
+typedef enum { typeInt,typeFloat,typeString,typeBool,VAR_AS_LVALUE,VAR_AS_EXPR} conType;
 /* constants */
 typedef struct {
  conType conT;
@@ -57,5 +57,4 @@ extern int scopeLevel;
 extern int scopesParent[MAX_SCOPES];	/* start from index 1*/
 extern varData sym[MAX_SCOPES][MAX_VARS]; /* first index contains the number of variables in this scope*/
 extern int yylineno;
-
 

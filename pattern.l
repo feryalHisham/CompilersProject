@@ -1,9 +1,11 @@
 %{
+
 #include <stdlib.h>
 #include "typesStructs.h"
+#include <string>
 #include "y.tab.h"
 //int yylineno;
-void yyerror(char *);
+void yyerror(std::string);
 %}
 
 %%

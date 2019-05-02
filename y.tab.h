@@ -34,7 +34,7 @@
 # define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -92,7 +92,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 28 "gram.y" /* yacc.c:1909  */
+#line 30 "gram.y" /* yacc.c:1909  */
 
     int iValue;                 /* integer value */
     char sIndex;                /* symbol table index */

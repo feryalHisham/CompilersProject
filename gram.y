@@ -1,25 +1,27 @@
 %{
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "typesStructs.h"
+//#include "typesStructs.h"
+#include "compiler.h"
 #include <string.h>
-#define VAR_AS_LVALUE -1
-#define VAR_AS_EXPR -2
+#include <string>
+#include <vector>
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
-nodeType *id(char *s,int vType);
+nodeType *id(char *s,conType vType);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
 varData *findVar(char* varName, int scopeIndex);
 void freeNode(nodeType *p);
-int ex(nodeType *p);
+//int ex(nodeType *p);
 int yylex(void);
 
-
-FILE * yyin; // input file for lex
+char temp[]= "c";
+//FILE * yyin; // input file for lex
 FILE * stderr;  // for logging errors
-void yyerror(char *s);
+void yyerror(std::string s);
 varData sym[MAX_SCOPES][MAX_VARS];                    /* symbol table */
 int scopesParent[MAX_SCOPES];
 int scopeLevel;
@@ -79,21 +81,21 @@ stmt_list:
         ;
 
 declaration:  
-			 INT_TYPE VARIABLE     { $$ = id($2,$1);}
-			| INT_TYPE VARIABLE ';' { $$ = id($2,$1);}
-			| FLOAT_TYPE VARIABLE { $$ = id($2,$1);}
-			| FLOAT_TYPE VARIABLE ';' { $$ = id($2,$1);}
-			| STRING_TYPE VARIABLE { $$ = id($2,$1);}
-			| STRING_TYPE VARIABLE ';' { $$ = id($2,$1);}
-			| BOOL_TYPE VARIABLE { $$ = id($2,$1);}
-			| BOOL_TYPE VARIABLE ';' { $$ = id($2,$1);}
+			 INT_TYPE VARIABLE     { $$ = id($2,typeInt);}
+			| INT_TYPE VARIABLE ';' { $$ = id($2,typeInt);}
+			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat);}
+			| FLOAT_TYPE VARIABLE ';' { $$ = id($2,typeFloat);}
+			| STRING_TYPE VARIABLE { $$ = id($2,typeString);}
+			| STRING_TYPE VARIABLE ';' { $$ = id($2,typeString);}
+			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool);}
+			| BOOL_TYPE VARIABLE ';' { $$ = id($2,typeBool);}
 	          ;     
 
 expr:
-          INTEGER               { $$ = con($1, 0.0, "", true, typeInt); }
-		| FLOAT 				{ $$ = con(0, $1, "", true, typeFloat); }
+          INTEGER               { $$ = con($1, 0.0, temp, true, typeInt); }
+		| FLOAT 				{ $$ = con(0, $1,temp, true, typeFloat); }
 		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
-		| BOOL					{ $$ = con(0, 0.0, "", $1, typeBool); }
+		| BOOL					{ $$ = con(0, 0.0, temp, $1, typeBool); }
         | VARIABLE              { $$ = id($1,VAR_AS_EXPR); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
@@ -115,8 +117,8 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
      nodeType *p;
     
     /* allocate node */
-    if ((p = malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+    //if ((p = malloc(sizeof(nodeType))) == NULL)
+      //  yyerror("out of memory");
 
     /* copy information */
     p->type = typeCon;
@@ -140,12 +142,12 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
     return p;
 }
 
-nodeType *id(char *s,int vType) {
+nodeType *id(char *s,conType vType) {
     nodeType *p;
 
     /* allocate node */
-    if ((p = malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+    //if ((p = malloc(sizeof(nodeType))) == NULL)
+      //  yyerror("out of memory");
 
     //scopesParent[scopeLevel] = scopeLevel-1;
 
@@ -185,8 +187,8 @@ nodeType *opr(int oper, int nops, ...) {
     int i;
 
     /* allocate node, extending op array */
-    if ((p = malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
-        yyerror("out of memory");
+    //if ((p = malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
+      //  yyerror("out of memory");
 
     /* copy information */
     p->type = typeOpr;
@@ -226,9 +228,9 @@ void freeNode(nodeType *p) {
     free (p);
 }
 
-void yyerror(char* s) {
+void yyerror(std::string s) {
     //fprintf(stdout, "%s\n", s);
-    fprintf(stdout, "line %d: %s\n", yylineno, s);
+    //fprintf(stdout, "line %d: %s\n", yylineno, s);
     exit(0);
 }
 
@@ -249,6 +251,7 @@ varData *findVar(char* varName, int scopeIndex){
 
 int main(void) {
     scopeLevel=1;
+    extern FILE * yyin;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
     fclose(yyin);
