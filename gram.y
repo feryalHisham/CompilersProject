@@ -115,11 +115,13 @@ expr:
 
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
      nodeType *p;
-    
+
+    //printf("con\n");
+
     /* allocate node */
     //if ((p = malloc(sizeof(nodeType))) == NULL)
       //  yyerror("out of memory");
-
+    p = new nodeType;
     /* copy information */
     p->type = typeCon;
     p->exType = typeOther;
@@ -145,10 +147,11 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 nodeType *id(char *s,conType vType) {
     nodeType *p;
 
+    //printf("id\n");
     /* allocate node */
     //if ((p = malloc(sizeof(nodeType))) == NULL)
       //  yyerror("out of memory");
-
+    p = new nodeType;
     //scopesParent[scopeLevel] = scopeLevel-1;
 
     varData *existVar = findVar(s,scopeLevel);
@@ -159,13 +162,13 @@ nodeType *id(char *s,conType vType) {
         yyerror("Variable is not declared.");
     }
 
-
     /* copy information */
     p->type = typeId;
     p->id.keyName = s;
     p->id.scopeIndex = scopeLevel;
     p->id.varIndex = sym[scopeLevel][0].valueInt+1;
     p->exType = typeOther;
+    //printf("after findVar\n");
 
 
     if(existVar == NULL && vType >=0 ){
@@ -182,6 +185,7 @@ nodeType *id(char *s,conType vType) {
 }
 
 nodeType *opr(int oper, int nops, ...) {
+    //printf("opr\n");
     va_list ap;
     nodeType *p;
     int i;
@@ -189,7 +193,7 @@ nodeType *opr(int oper, int nops, ...) {
     /* allocate node, extending op array */
     //if ((p = malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
       //  yyerror("out of memory");
-
+    p = new nodeType;
     /* copy information */
     p->type = typeOpr;
     p->opr.oper = oper;
