@@ -151,8 +151,8 @@ nodeType *id(char *s,conType vType) {
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
-
-	
+    
+    
     varData* existVar = findVar(s,vType >= 4);
     
     if(existVar->null != true && vType < 4) { 
@@ -232,13 +232,19 @@ nodeType *opr(int oper, int nops, ...) {
 
 void freeNode(nodeType *p) {
     int i;
-
+    fprintf(stdout, "free node %d\n", p->type);
     if (!p) return;
+     char temp2[]="x";
+                fprintf(stdout, "after set free %d: %s\n", yylineno, p->id.keyName);
     if (p->type == typeOpr) {
         for (i = 0; i < p->opr.nops; i++)
             freeNode(p->opr.op[i]);
     }
+               
     free (p);
+				int size=sym[sym.size()-1].size();
+
+                 fprintf(stdout, "after set free %d: %s\n", size, sym[sym.size()-1][p->id.keyName].varName);
 }
 
 void yyerror(std::string s) {
@@ -253,7 +259,8 @@ varData* findVar(char* varName, bool searchParent){
     int depth = searchParent ? 0 : sym.size() -1;
     fprintf(stdout, "line %d: %s\n", yylineno, varName);
     for(int i=sym.size() -1; i >= 0; i--){  /*first search in the same scope*/
-    fprintf(stdout, "in for loop %d: %s\n", i, sym[i][varName].varName);
+    int size=sym[i].size();
+    fprintf(stdout, "in for loop %d: %s\n",size , varName);
         if(sym[i].find(varName) != sym[i].end()) 
                 {
 					printf("find var\n");
