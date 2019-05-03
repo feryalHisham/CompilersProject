@@ -56,7 +56,7 @@ typedef struct {
 } varData;
 
 
-extern std::vector<std::map<char*,varData>> sym;
+extern std::vector<std::map<std::string,varData>> sym;
 extern int yylineno;
 extern varData v;
 

@@ -80,7 +80,7 @@ using namespace std;
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(char *s,conType vType);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
-varData *findVar(char* varName, bool searchParent);
+varData *findVar(string varName, bool searchParent);
 void freeNode(nodeType *p);
 //int ex(nodeType *p);
 int yylex(void);
@@ -89,7 +89,7 @@ char temp[]= "c";
 varData v;
 FILE * stderr;  // for logging errors
 void yyerror(std::string s);
-vector<map<char*,varData>> sym;
+vector<map<string,varData>> sym;
 
 
 #line 96 "y.tab.c" /* yacc.c:339  */
@@ -1825,8 +1825,9 @@ nodeType *id(char *s,conType vType) {
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
     
+    string ss(s);
     
-    varData* existVar = findVar(s,vType >= 4);
+    varData* existVar = findVar(ss,vType >= 4);
     
     if(existVar->null != true && vType < 4) { 
         yyerror("Variable declared before.");
@@ -1851,18 +1852,16 @@ nodeType *id(char *s,conType vType) {
 
 
     if(existVar->null && vType < 4 ){
-        printf("set varDAta1\n");
         varData var;
 		var.used = false;
 		var.initialized = false;
         var.varType = vType;
         var.varName = s;
         var.null = false;
-		sym[sym.size()-1].insert(std::pair<char*,varData>(s,var));
-        fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
-	    printf("set varDAta2\n");
+		sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
+
     }
-            fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
+    //fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
     return p;
 }
 
@@ -1905,19 +1904,16 @@ nodeType *opr(int oper, int nops, ...) {
 
 void freeNode(nodeType *p) {
     int i;
-    fprintf(stdout, "free node %d\n", p->type);
+
     if (!p) return;
-     char temp2[]="x";
-                fprintf(stdout, "after set free %d: %s\n", yylineno, p->id.keyName);
+   
     if (p->type == typeOpr) {
         for (i = 0; i < p->opr.nops; i++)
             freeNode(p->opr.op[i]);
     }
                
     free (p);
-				int size=sym[sym.size()-1].size();
-
-                 fprintf(stdout, "after set free %d: %s\n", size, sym[sym.size()-1][p->id.keyName].varName);
+				
 }
 
 void yyerror(std::string s) {
@@ -1926,28 +1922,27 @@ void yyerror(std::string s) {
     exit(0);
 }
 
-varData* findVar(char* varName, bool searchParent){
+varData* findVar(string varName, bool searchParent){
 
-    printf("find var1\n");
+    //printf("find var1\n");
     int depth = searchParent ? 0 : sym.size() -1;
-    fprintf(stdout, "line %d: %s\n", yylineno, varName);
     for(int i=sym.size() -1; i >= 0; i--){  /*first search in the same scope*/
     int size=sym[i].size();
-    fprintf(stdout, "in for loop %d: %s\n",size , varName);
+    //fprintf(stdout, "in for loop %d: %s\n",size , varName.c_str());
         if(sym[i].find(varName) != sym[i].end()) 
                 {
-					printf("find var\n");
+					//printf("find var\n");
 					return &sym[i][varName];
                 }
     }
-    printf("find var2\n");
     return &v; /*search in parent scope*/
 
 }
 
+
 int main(void) {
     v.null = true;
-	sym.push_back(map<char*,varData>());
+	sym.push_back(map<string,varData>());
     extern FILE * yyin;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
