@@ -156,10 +156,10 @@ nodeType *id(char *s,conType vType) {
     //scopesParent[scopeLevel] = scopeLevel-1;
 
     varData *existVar = findVar(s,scopeLevel);
-    if(existVar != NULL && vType >=0) {  //&& existVar->scopeIndex == scopeLevel
+    if(existVar != NULL && vType < 4) {  //&& existVar->scopeIndex == scopeLevel
         yyerror("Variable declared before.");
     }
-    if(existVar == NULL && vType <0 ){
+    if(existVar == NULL && vType >= 4 ){
         yyerror("Variable is not declared.");
     }
 
@@ -213,7 +213,6 @@ nodeType *opr(int oper, int nops, ...) {
 
     if(p->exType == typeMath)
 	{
-        printf("math oper\n");
     	for (i = 0; i < nops; i++)
 	   if(p->opr.op[i]->exType == typeLog)
 		yyerror("Can't include non Mathematical expression.");
