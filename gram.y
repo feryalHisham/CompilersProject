@@ -3,13 +3,15 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "typesStructs.h"
-
-
+#include <string.h>
+#define VAR_AS_LVALUE -1
+#define VAR_AS_EXPR -2
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(char *s,int vType);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
+varData *findVar(char* varName, int scopeIndex);
 void freeNode(nodeType *p);
 int ex(nodeType *p);
 int yylex(void);
@@ -18,8 +20,9 @@ int yylex(void);
 FILE * yyin; // input file for lex
 FILE * stderr;  // for logging errors
 void yyerror(char *s);
-varData sym[100][50];                    /* symbol table */
-int noOfScopes;
+varData sym[MAX_SCOPES][MAX_VARS];                    /* symbol table */
+int scopesParent[MAX_SCOPES];
+int scopeLevel;
 %}
 
 %union {
@@ -62,8 +65,8 @@ function:
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration                  { $$ = $1; }
-	| declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
-        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,1), $3); }
+	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
+        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
         | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
         | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }
@@ -91,7 +94,7 @@ expr:
 		| FLOAT 				{ $$ = con(0, $1, "", true, typeFloat); }
 		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
 		| BOOL					{ $$ = con(0, 0.0, "", $1, typeBool); }
-        | VARIABLE              { $$ = id($1,1); }
+        | VARIABLE              { $$ = id($1,VAR_AS_EXPR); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
         | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
@@ -140,22 +143,39 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 nodeType *id(char *s,int vType) {
     nodeType *p;
 
-
     /* allocate node */
     if ((p = malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
-    
+
+    //scopesParent[scopeLevel] = scopeLevel-1;
+
+    varData *existVar = findVar(s,scopeLevel);
+    if(existVar != NULL && vType >=0) {  //&& existVar->scopeIndex == scopeLevel
+        yyerror("Variable declared before.");
+    }
+    if(existVar == NULL && vType <0 ){
+        yyerror("Variable is not declared.");
+    }
+
+
     /* copy information */
     p->type = typeId;
     p->id.keyName = s;
-    p->id.scopeIndex = noOfScopes;
-    p->id.varIndex = ++sym[noOfScopes][0].valueInt;
+    p->id.scopeIndex = scopeLevel;
+    p->id.varIndex = sym[scopeLevel][0].valueInt+1;
     p->exType = typeOther;
-    
-    varData var;
-    var.varType=vType;
-    var.varName=s;
-    sym[p->id.scopeIndex][p->id.varIndex] = var;
+
+
+    if(existVar == NULL && vType >=0 ){
+        varData var;
+        var.varType=vType;
+        var.varName=s;
+        var.scopeIndex = scopeLevel;
+        sym[p->id.scopeIndex][p->id.varIndex] = var;
+        sym[scopeLevel][0].valueInt++;
+    }
+
+
     return p;
 }
 
@@ -188,7 +208,7 @@ nodeType *opr(int oper, int nops, ...) {
 	{
     	for (i = 0; i < nops; i++)
 	   if(p->opr.op[i]->exType == typeLog)
-		yyerror("Can't include non Mathmatical expression.");
+		yyerror("Can't include non Mathematical expression.");
 	}
 
     va_end(ap);
@@ -206,15 +226,29 @@ void freeNode(nodeType *p) {
     free (p);
 }
 
-void yyerror(char *s) {
+void yyerror(char* s) {
     //fprintf(stdout, "%s\n", s);
     fprintf(stdout, "line %d: %s\n", yylineno, s);
     exit(0);
 }
 
+varData *findVar(char* varName, int scopeIndex){
+
+    //printf("var name %s scope %d vars %d\n",varName,scopeIndex,sym[scopeIndex][0].valueInt);
+    if(scopeIndex == 0)
+        return NULL;
+
+    for(int i=1;i<=sym[scopeIndex][0].valueInt;i++){  /*first search in the same scope*/
+        if(strcmp(sym[scopeIndex][i].varName ,varName) == 0)
+            return &sym[scopeIndex][i];
+    }
+
+    return findVar(varName,scopesParent[scopeIndex]); /*search in parent scope*/
+
+}
 
 int main(void) {
-    noOfScopes=1;
+    scopeLevel=1;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
     fclose(yyin);

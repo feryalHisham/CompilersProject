@@ -1,3 +1,10 @@
 int ayy = 3 + (4+5) * 6.3 ;
 string n;
-int
+float c;
+if(c>0){
+c = c-1;
+}
+
+while(ayy+3 < n){
+n = "sleepy";
+}

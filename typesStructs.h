@@ -1,5 +1,6 @@
 #include <stdbool.h>
-
+#define MAX_SCOPES 100
+#define MAX_VARS 50
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 typedef enum { typeLog,typeMath,typeOther } exprType;
 typedef enum { typeInt,typeFloat,typeString,typeBool} conType;
@@ -41,6 +42,7 @@ typedef struct nodeTypeTag {
 
 typedef struct {
 	conType varType;
+    int scopeIndex;
   	char* varName;
 	bool constant;
 	 union {
@@ -51,9 +53,9 @@ typedef struct {
    };	
 } varData;
 
-extern int noOfScopes;
-extern int scopesParent[100];	/* start from index 1*/
-extern varData sym[100][50]; /* first index contains the number of variables in this scope*/
+extern int scopeLevel;
+extern int scopesParent[MAX_SCOPES];	/* start from index 1*/
+extern varData sym[MAX_SCOPES][MAX_VARS]; /* first index contains the number of variables in this scope*/
 extern int yylineno;
 
 
