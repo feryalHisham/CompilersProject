@@ -116,7 +116,6 @@ expr:
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
      nodeType *p;
 
-    //printf("con\n");
 
     /* allocate node */
     //if ((p = malloc(sizeof(nodeType))) == NULL)
@@ -141,13 +140,15 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 			p->con.valueBool = valB;
     }
 
+    printf("con\n");
+
+
     return p;
 }
 
 nodeType *id(char *s,conType vType) {
     nodeType *p;
 
-    //printf("id\n");
     /* allocate node */
     //if ((p = malloc(sizeof(nodeType))) == NULL)
       //  yyerror("out of memory");
@@ -180,12 +181,12 @@ nodeType *id(char *s,conType vType) {
         sym[scopeLevel][0].valueInt++;
     }
 
+    printf("id\n");
 
     return p;
 }
 
 nodeType *opr(int oper, int nops, ...) {
-    //printf("opr\n");
     va_list ap;
     nodeType *p;
     int i;
@@ -212,12 +213,14 @@ nodeType *opr(int oper, int nops, ...) {
 
     if(p->exType == typeMath)
 	{
+        printf("math oper\n");
     	for (i = 0; i < nops; i++)
 	   if(p->opr.op[i]->exType == typeLog)
 		yyerror("Can't include non Mathematical expression.");
 	}
 
     va_end(ap);
+    printf("opr\n");
     return p;
 }
 
@@ -240,7 +243,7 @@ void yyerror(std::string s) {
 
 varData *findVar(char* varName, int scopeIndex){
 
-    //printf("var name %s scope %d vars %d\n",varName,scopeIndex,sym[scopeIndex][0].valueInt);
+    printf("var name %s scope %d vars %d\n",varName,scopeIndex,sym[scopeIndex][0].valueInt);
     if(scopeIndex == 0)
         return NULL;
 

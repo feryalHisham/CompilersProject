@@ -1,5 +1,6 @@
-int ayy = 3 + (4+5) * 6.3 ;
+int a = 3 + 4;
 string n;
+int ayy = 3 + (4+5) * 6.3 ;
 float c;
 if(c>0){
 c = c-1;

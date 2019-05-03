@@ -9,11 +9,13 @@ int ex(nodeType *p) {
     int lbl1, lbl2;
 
     if (!p) return 0;
+    printf("compiler\n");
+    printf("p type %d",p->type);
     switch(p->type) {
     case typeCon: 
 		switch(p->con.conT){
 		case typeInt:
-			printf("\tpush\t%d\n", p->con.valueInt); 
+			printf("\tpush\t%d\n", p->con.valueInt);
 		break;
 		case typeFloat:
 			printf("\tpush\t%f\n", p->con.valueFloat); 
@@ -30,7 +32,7 @@ int ex(nodeType *p) {
         printf("\tpush\t%s\n", p->id.keyName); 
         break;
     case typeOpr:
-    	// fprintf(stdout, "type %d %c \n", p->exType,p->opr.oper);
+    	 fprintf(stdout, "type %d %c \n", p->exType,p->opr.oper);
         switch(p->opr.oper) {
         case WHILE:
             printf("L%03d:\n", lbl1 = lbl++);
