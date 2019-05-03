@@ -11,9 +11,7 @@ int ex(nodeType *p) {
 
     if (!p) return 0;
 
-    /*printf("p type %d",p->exType);
-    printf("compiler\n");
-    printf("p type %d",p->type);*/
+  
     switch(p->type) {
     case typeCon: 
 		switch(p->con.conT){

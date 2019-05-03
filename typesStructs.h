@@ -1,6 +1,8 @@
 #include <stdbool.h>
-#define MAX_SCOPES 100
-#define MAX_VARS 50
+#include <vector>
+#include <map>
+
+
 typedef enum { typeCon, typeId, typeOpr } nodeEnum;
 typedef enum { typeLog,typeMath,typeOther } exprType;
 typedef enum { typeInt,typeFloat,typeString,typeBool,VAR_AS_LVALUE,VAR_AS_EXPR} conType;
@@ -19,8 +21,6 @@ typedef struct {
 /* identifiers */
 typedef struct {
     char* keyName;                      /* subscript to sym array */
-    int scopeIndex;
-    int varIndex;
 } idNodeType;
 
 /* operators */
@@ -42,9 +42,11 @@ typedef struct nodeTypeTag {
 
 typedef struct {
 	conType varType;
-    int scopeIndex;
   	char* varName;
 	bool constant;
+        bool used;
+	bool initialized;
+        bool null;
 	 union {
     int valueInt;                  /* value of constant */
     char* valueString;
@@ -53,8 +55,8 @@ typedef struct {
    };	
 } varData;
 
-extern int scopeLevel;
-extern int scopesParent[MAX_SCOPES];	/* start from index 1*/
-extern varData sym[MAX_SCOPES][MAX_VARS]; /* first index contains the number of variables in this scope*/
+
+extern std::vector<std::map<char*,varData>> sym;
 extern int yylineno;
+extern varData v;
 

@@ -7,24 +7,25 @@
 #include "compiler.h"
 #include <string.h>
 #include <string>
-#include <vector>
+
+using namespace std;
+
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
 nodeType *id(char *s,conType vType);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
-varData *findVar(char* varName, int scopeIndex);
+varData *findVar(char* varName, bool searchParent);
 void freeNode(nodeType *p);
 //int ex(nodeType *p);
 int yylex(void);
 
 char temp[]= "c";
-//FILE * yyin; // input file for lex
+varData v;
 FILE * stderr;  // for logging errors
 void yyerror(std::string s);
-varData sym[MAX_SCOPES][MAX_VARS];                    /* symbol table */
-int scopesParent[MAX_SCOPES];
-int scopeLevel;
+vector<map<char*,varData>> sym;
+
 %}
 
 %union {
@@ -120,7 +121,7 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
-    //p = new nodeType;
+
     /* copy information */
     p->type = typeCon;
     p->exType = typeOther;
@@ -140,8 +141,6 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 			p->con.valueBool = valB;
     }
 
-    // printf("con\n");
-
 
     return p;
 }
@@ -152,37 +151,45 @@ nodeType *id(char *s,conType vType) {
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
         yyerror("out of memory");
-    // p = new nodeType;
-    //scopesParent[scopeLevel] = scopeLevel-1;
 
-    varData *existVar = findVar(s,scopeLevel);
-    if(existVar != NULL && vType < 4) {  //&& existVar->scopeIndex == scopeLevel
+	
+    varData* existVar = findVar(s,vType >= 4);
+    
+    if(existVar->null != true && vType < 4) { 
         yyerror("Variable declared before.");
     }
-    if(existVar == NULL && vType >= 4 ){
+	// x = y;
+    if(existVar->null && vType >= 4 ){
         yyerror("Variable is not declared.");
+    }
+	// = y
+    else if(vType == VAR_AS_EXPR)
+    {
+		if(existVar->initialized == false)
+			yyerror("Variable is not initialized.");
+		else
+			existVar->used = true; // Check this.
     }
 
     /* copy information */
     p->type = typeId;
     p->id.keyName = s;
-    p->id.scopeIndex = scopeLevel;
-    p->id.varIndex = sym[scopeLevel][0].valueInt+1;
     p->exType = typeOther;
-    //printf("after findVar\n");
 
 
-    if(existVar == NULL && vType >=0 ){
+    if(existVar->null && vType < 4 ){
+        printf("set varDAta1\n");
         varData var;
-        var.varType=vType;
-        var.varName=s;
-        var.scopeIndex = scopeLevel;
-        sym[p->id.scopeIndex][p->id.varIndex] = var;
-        sym[scopeLevel][0].valueInt++;
+		var.used = false;
+		var.initialized = false;
+        var.varType = vType;
+        var.varName = s;
+        var.null = false;
+		sym[sym.size()-1].insert(std::pair<char*,varData>(s,var));
+        fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
+	    printf("set varDAta2\n");
     }
-
-    //printf("id\n");
-
+            fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
     return p;
 }
 
@@ -194,7 +201,7 @@ nodeType *opr(int oper, int nops, ...) {
     /* allocate node, extending op array */
     if ((p = (nodeType *)malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
         yyerror("out of memory");
-    //p = new nodeType;
+
     /* copy information */
     p->type = typeOpr;
     p->opr.oper = oper;
@@ -240,23 +247,27 @@ void yyerror(std::string s) {
     exit(0);
 }
 
-varData *findVar(char* varName, int scopeIndex){
+varData* findVar(char* varName, bool searchParent){
 
-    //printf("var name %s scope %d vars %d\n",varName,scopeIndex,sym[scopeIndex][0].valueInt);
-    if(scopeIndex == 0)
-        return NULL;
-
-    for(int i=1;i<=sym[scopeIndex][0].valueInt;i++){  /*first search in the same scope*/
-        if(strcmp(sym[scopeIndex][i].varName ,varName) == 0)
-            return &sym[scopeIndex][i];
+    printf("find var1\n");
+    int depth = searchParent ? 0 : sym.size() -1;
+    fprintf(stdout, "line %d: %s\n", yylineno, varName);
+    for(int i=sym.size() -1; i >= 0; i--){  /*first search in the same scope*/
+    fprintf(stdout, "in for loop %d: %s\n", i, sym[i][varName].varName);
+        if(sym[i].find(varName) != sym[i].end()) 
+                {
+					printf("find var\n");
+					return &sym[i][varName];
+                }
     }
-
-    return findVar(varName,scopesParent[scopeIndex]); /*search in parent scope*/
+    printf("find var2\n");
+    return &v; /*search in parent scope*/
 
 }
 
 int main(void) {
-    scopeLevel=1;
+    v.null = true;
+	sym.push_back(map<char*,varData>());
     extern FILE * yyin;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
