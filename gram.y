@@ -41,7 +41,7 @@ int scopeLevel;
 %token <fValue> FLOAT
 %token <bValue> BOOL
 %token <sValue> VARIABLE
-%token WHILE IF PRINT 
+%token WHILE IF PRINT SWITCH CASE DEFAULT
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -52,63 +52,78 @@ int scopeLevel;
 %left '*' '/'
 %nonassoc UMINUS
 
-%type <nPtr> stmt declaration expr stmt_list
+%type <nPtr> stmt declaration expr stmt_list default_stmt case_stmt switch_stmt
 
 %%
 
 program:
-        function                { exit(0); }
+        function                                    { exit(0); }
         ;
 
 function:
-          function stmt         { ex($2); freeNode($2); }
+          function stmt                             { ex($2); freeNode($2); }
         | /* NULL */
         ;
 
-stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
-        | declaration                  { $$ = $1; }
-	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
-        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
-        | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
-        | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
-        | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }
-        | '{' stmt_list '}'              { $$ = $2; }
+stmt:	PRINT expr ';'                              { $$ = opr(PRINT, 1, $2); }
+        | declaration                               { $$ = $1; }
+	    | declaration '=' expr ';'                  {$$ = opr('=', 2, $1, $3);}
+        | VARIABLE '=' expr ';'                     { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
+        | WHILE '(' expr ')' stmt                   { $$ = opr(WHILE, 2, $3, $5); }
+        | IF '(' expr ')' stmt %prec IFX            { $$ = opr(IF, 2, $3, $5); }
+        | IF '(' expr ')' stmt ELSE stmt            { $$ = opr(IF, 3, $3, $5, $7); }
+        | switch_stmt                               {$$ = $1;}
+        | '{' stmt_list '}'                         { $$ = $2; }
         ;
 
 stmt_list:
-          stmt                  { $$ = $1; }
-        | stmt_list stmt        { $$ = opr(';', 2, $1, $2); }
+          stmt                                      { $$ = $1; }
+        | stmt_list stmt                            { $$ = opr(';', 2, $1, $2); }
         ;
 
 declaration:  
-			 INT_TYPE VARIABLE     { $$ = id($2,typeInt);}
-			| INT_TYPE VARIABLE ';' { $$ = id($2,typeInt);}
-			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat);}
-			| FLOAT_TYPE VARIABLE ';' { $$ = id($2,typeFloat);}
-			| STRING_TYPE VARIABLE { $$ = id($2,typeString);}
-			| STRING_TYPE VARIABLE ';' { $$ = id($2,typeString);}
-			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool);}
-			| BOOL_TYPE VARIABLE ';' { $$ = id($2,typeBool);}
-	          ;     
+			 INT_TYPE VARIABLE                      { $$ = id($2,typeInt);}
+			| INT_TYPE VARIABLE ';'                 { $$ = id($2,typeInt);}
+			| FLOAT_TYPE VARIABLE                   { $$ = id($2,typeFloat);}
+			| FLOAT_TYPE VARIABLE ';'               { $$ = id($2,typeFloat);}
+			| STRING_TYPE VARIABLE                  { $$ = id($2,typeString);}
+			| STRING_TYPE VARIABLE ';'              { $$ = id($2,typeString);}
+			| BOOL_TYPE VARIABLE                    { $$ = id($2,typeBool);}
+			| BOOL_TYPE VARIABLE ';'                { $$ = id($2,typeBool);}
+	          ;
+
+switch_stmt:
+        SWITCH '(' expr ')' '{' case_stmt default_stmt '}'      {$$ = opr(SWITCH,3,$3,$6,$7);}
+        ;
+
+case_stmt:
+        CASE '(' expr ')' '{' stmt_list '}' case_stmt                {$$ = opr(CASE,3,$3,$6,$8);}
+        | CASE '(' expr ')' '{' stmt_list '}'                        {$$ = opr(CASE,2,$3,$6);}
+        ;
+
+default_stmt:
+        DEFAULT '{' stmt '}'                                    {$$ = opr(DEFAULT,1,$3);}
+        ;
+
 
 expr:
-          INTEGER               { $$ = con($1, 0.0, temp, true, typeInt); }
-		| FLOAT 				{ $$ = con(0, $1,temp, true, typeFloat); }
-		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
-		| BOOL					{ $$ = con(0, 0.0, temp, $1, typeBool); }
-        | VARIABLE              { $$ = id($1,VAR_AS_EXPR); }
-        | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
-        | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
-        | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
-        | expr '*' expr         { $$ = opr('*', 2, $1, $3); }
-        | expr '/' expr         { $$ = opr('/', 2, $1, $3); }
-        | expr '<' expr         { $$ = opr('<', 2, $1, $3); }
-        | expr '>' expr         { $$ = opr('>', 2, $1, $3); }
-        | expr GE expr          { $$ = opr(GE, 2, $1, $3); }
-        | expr LE expr          { $$ = opr(LE, 2, $1, $3); }
-        | expr NE expr          { $$ = opr(NE, 2, $1, $3); }
-        | expr EQ expr          { $$ = opr(EQ, 2, $1, $3); }
-        | '(' expr ')'          { $$ = $2; }
+          INTEGER                                   { $$ = con($1, 0.0, temp, true, typeInt); }
+		| FLOAT 				                    { $$ = con(0, $1,temp, true, typeFloat); }
+		| STRING				                    { $$ = con(0, 0.0, $1, true, typeString); }
+		| BOOL					                    { $$ = con(0, 0.0, temp, $1, typeBool); }
+        | VARIABLE                                  { $$ = id($1,VAR_AS_EXPR); }
+        | '-' expr %prec UMINUS                     { $$ = opr(UMINUS, 1, $2); }
+        | expr '+' expr                             { $$ = opr('+', 2, $1, $3); }
+        | expr '-' expr                             { $$ = opr('-', 2, $1, $3); }
+        | expr '*' expr                             { $$ = opr('*', 2, $1, $3); }
+        | expr '/' expr                             { $$ = opr('/', 2, $1, $3); }
+        | expr '<' expr                             { $$ = opr('<', 2, $1, $3); }
+        | expr '>' expr                             { $$ = opr('>', 2, $1, $3); }
+        | expr GE expr                              { $$ = opr(GE, 2, $1, $3); }
+        | expr LE expr                              { $$ = opr(LE, 2, $1, $3); }
+        | expr NE expr                              { $$ = opr(NE, 2, $1, $3); }
+        | expr EQ expr                              { $$ = opr(EQ, 2, $1, $3); }
+        | '(' expr ')'                              { $$ = $2; }
         ;
 
 %%
@@ -199,6 +214,8 @@ nodeType *opr(int oper, int nops, ...) {
     p->type = typeOpr;
     p->opr.oper = oper;
     p->opr.nops = nops;
+
+    p->opr.dummyName = (char*)"dummy";
 
     if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*' || p->opr.oper == '/' )
     	p->exType = typeMath;

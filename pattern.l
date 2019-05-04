@@ -18,6 +18,9 @@ void yyerror(std::string);
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;
+"switch"        return SWITCH;
+"case"          return CASE;
+"default"       return DEFAULT;
 
 "int"           { yylval.iValue=0;
 		return INT_TYPE;

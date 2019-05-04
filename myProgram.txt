@@ -1,12 +1,28 @@
 int a = 3+ 4;
+int b = 5;
 string n;
-int ayy = 3 + (4+5) * 6.3 ;
-float c;
-if(c>0)
-{
-c = c-1;
+switch(a+b){
+case(3){
+while(b<2){
+int c =0;
+}
+int x;
+}
+case(4){
+a = a-1;
+}
+default{
+a = a+1;
+}
 }
 
-while(ayy+3 < n){
-n = "sleepy";
+int ayy = 3+5*9;
+int xxxx;
+switch(a){
+case(b+1){
+int v;
+}
+default{
+int l;
+}
 }
