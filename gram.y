@@ -67,7 +67,7 @@ function:
         ;
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
-        | declaration                  { $$ = $1; }
+        | declaration ';'                   { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
@@ -82,14 +82,11 @@ stmt_list:
         ;
 
 declaration:  
-			 INT_TYPE VARIABLE     { $$ = id($2,typeInt);}
-			| INT_TYPE VARIABLE ';' { $$ = id($2,typeInt);}
+			 
+			 INT_TYPE VARIABLE  { $$ = id($2,typeInt);}
 			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat);}
-			| FLOAT_TYPE VARIABLE ';' { $$ = id($2,typeFloat);}
 			| STRING_TYPE VARIABLE { $$ = id($2,typeString);}
-			| STRING_TYPE VARIABLE ';' { $$ = id($2,typeString);}
 			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool);}
-			| BOOL_TYPE VARIABLE ';' { $$ = id($2,typeBool);}
 	          ;     
 
 expr:

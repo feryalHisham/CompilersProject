@@ -1,2 +1,2 @@
-int x = 3;
-int x;
+int x ;
+
