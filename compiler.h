@@ -35,6 +35,14 @@ int ex(nodeType *p) {
     case typeOpr:
     	 //fprintf(stdout, "type %d %c \n", p->exType,p->opr.oper);
         switch(p->opr.oper) {
+        case DO:
+            printf("L%03d:\n", lbl1 = lbl++);
+            ex(p->opr.op[0]);
+            ex(p->opr.op[1]);
+            printf("\tjz\tL%03d\n", lbl2 = lbl++);
+            printf("\tjmp\tL%03d\n", lbl1);
+            printf("L%03d:\n", lbl2);
+            break;
         case WHILE:
             printf("L%03d:\n", lbl1 = lbl++);
             ex(p->opr.op[0]);
@@ -42,6 +50,11 @@ int ex(nodeType *p) {
             ex(p->opr.op[1]);
             printf("\tjmp\tL%03d\n", lbl1);
             printf("L%03d:\n", lbl2);
+            break;
+        case FOR:
+            ex(p->opr.op[0]);
+            // ex(p->opr.op[1]);
+            printf("\tjmp\tL%03d\n", lbl1);
             break;
         case IF:
             ex(p->opr.op[0]);
