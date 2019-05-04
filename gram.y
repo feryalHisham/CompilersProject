@@ -42,7 +42,7 @@ vector<map<string,varData>> sym;
 %token <fValue> FLOAT
 %token <bValue> BOOL
 %token <sValue> VARIABLE
-%token WHILE IF PRINT DO FOR
+%token WHILE IF PRINT 
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -70,8 +70,6 @@ stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration                  { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
-        | DO '{'stmt'}' WHILE '(' expr ')' ';'                 { $$ = opr(DO, 1, $3, $7); }
-        | FOR '(' declaration '=' expr ';' expr ';' expr ')' '{' stmt '}'   { $$ = opr(FOR, 4, opr('=', 2, $3, $5), $7, $9, $12); }
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
         | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
         | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }

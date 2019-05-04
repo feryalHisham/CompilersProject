@@ -14,8 +14,6 @@ void yyerror(std::string);
 "<="            return LE;
 "=="            return EQ;
 "!="            return NE;
-"do"         	return DO;
-"for"			return FOR;
 "while"         return WHILE;
 "if"            return IF;
 "else"          return ELSE;
