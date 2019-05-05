@@ -14,7 +14,7 @@ using namespace std;
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
-nodeType *id(char *s,conType vType);
+nodeType *id(char *s,conType vType,bool constant);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
 varData *findVar(string varName, bool searchParent);
 void freeNode(nodeType *p);
@@ -25,6 +25,7 @@ char temp[]= "c";
 varData v;
 FILE * stderr;  // for logging errors
 void yyerror(std::string s);
+void yyerrorOveride(std::string s);
 void checkForUnusedVariables();
 void yyerrorUnused(std::string,int lineNo);
 void printAllErrors();
@@ -46,7 +47,7 @@ vector<pair<int,string>> errors;
 %token <fValue> FLOAT
 %token <bValue> BOOL
 %token <sValue> VARIABLE
-%token WHILE IF PRINT 
+%token WHILE IF PRINT CONST
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -73,7 +74,7 @@ function:
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration ';'                   { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
-        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
+        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE,false), $3); }
         | WHILE '(' expr ')' '{' stmt_list '}'   { $$ = opr(WHILE, 2, $3, $6); }
         | IF '(' expr ')' '{' stmt_list '}' %prec IFX {   $$ = opr(IF, 2, $3, $6); }
         | IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}' {  $$ = opr(IF, 3, $3, $6, $10); }
@@ -87,10 +88,14 @@ stmt_list:
 
 declaration:  
 			 
-			 INT_TYPE VARIABLE  { $$ = id($2,typeInt);}
-			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat);}
-			| STRING_TYPE VARIABLE { $$ = id($2,typeString);}
-			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool);}
+			 INT_TYPE VARIABLE  { $$ = id($2,typeInt,false);}
+            | CONST INT_TYPE VARIABLE  { $$ = id($3,typeInt,true);}
+			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat,false);}
+			| CONST FLOAT_TYPE VARIABLE { $$ = id($3,typeFloat,true);}
+			| STRING_TYPE VARIABLE { $$ = id($2,typeString,false);}
+			| CONST STRING_TYPE VARIABLE { $$ = id($3,typeString,true);}
+			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool,false);}
+			| CONST BOOL_TYPE VARIABLE  { $$ = id($3,typeBool,true);}
 	          ;     
 
 expr:
@@ -98,7 +103,7 @@ expr:
 		| FLOAT 				{ $$ = con(0, $1,temp, true, typeFloat); }
 		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
 		| BOOL					{ $$ = con(0, 0.0, temp, $1, typeBool); }
-        | VARIABLE              { $$ = id($1,VAR_AS_EXPR); }
+        | VARIABLE              { $$ = id($1,VAR_AS_EXPR,false); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
         | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
@@ -121,7 +126,7 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+        yyerrorOveride("out of memory");
 
     /* copy information */
     p->type = typeCon;
@@ -146,29 +151,29 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
     return p;
 }
 
-nodeType *id(char *s,conType vType) {
+nodeType *id(char *s,conType vType,bool constant) {
     nodeType *p;
 
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+        yyerrorOveride("out of memory");
     
     string ss(s);
     
     varData* existVar = findVar(ss,vType >= 4);
     
     if(existVar->null != true && vType < 4) { 
-        yyerror("Variable declared before.");
+        yyerrorOveride("Variable declared before.");
     }
 	// x = y;
     if(existVar->null && vType >= 4 ){
-        yyerror("Variable is not declared.");
+        yyerrorOveride("Variable is not declared.");
     }
 	// = y
     else if(vType == VAR_AS_EXPR)
     {		
 		/*if(existVar->initialized == false)
-			yyerror("Variable is not initialized.");
+			yyerrorOveride("Variable is not initialized.");
 		else*/
 			existVar->used = true; // Check this.
 		
@@ -181,13 +186,14 @@ nodeType *id(char *s,conType vType) {
 
 
     if(existVar->null && vType < 4 ){
-        varData var;
+    varData var;
 	var.used = false;
 	var.initialized = false;
+	var.constant = constant;
 	var.lineDeclared = yylineno;
-        var.varType = vType;
-        var.varName = s;
-        var.null = false;
+    var.varType = vType;
+    var.varName = s;
+    var.null = false;
 	sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
 
     }
@@ -202,7 +208,7 @@ nodeType *opr(int oper, int nops, ...) {
 
     /* allocate node, extending op array */
     if ((p = (nodeType *)malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
-        yyerror("out of memory");
+        yyerrorOveride("out of memory");
 
     /* copy information */
     p->type = typeOpr;
@@ -224,7 +230,7 @@ nodeType *opr(int oper, int nops, ...) {
 	{
     	for (i = 0; i < nops; i++)
 	   if(p->opr.op[i]->exType == typeLog)
-		yyerror("Can't include non Mathematical expression.");
+		yyerrorOveride("Can't include non Mathematical expression.");
 	}
 
     va_end(ap);
@@ -247,8 +253,12 @@ void freeNode(nodeType *p) {
 }
 
 void yyerror(std::string s) {
+    //errors.push_back({yylineno,s});
+    fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
+    // exit(0);
+}
+void yyerrorOveride(std::string s) {
     errors.push_back({yylineno,s});
-    //fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
     // exit(0);
 }
 void yyerrorUnused(std::string error,int lineNo){

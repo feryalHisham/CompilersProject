@@ -21,6 +21,7 @@ using namespace std;
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;
+"const" 		return CONST;
 
 "int"           { yylval.iValue=0;
 		return INT_TYPE;

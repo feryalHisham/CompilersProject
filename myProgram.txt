@@ -1,4 +1,4 @@
-int x=3;
+const int x=3;
 int y;
 if(x>3)
 {
