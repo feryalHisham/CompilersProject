@@ -11,7 +11,7 @@ case(3.5){
  string n = "noha";
 }
 
-case(3.4){
+case("heba"){
  int c =0;
 }
 
