@@ -18,12 +18,16 @@ using namespace std;
 "=="            return EQ;
 "!="            return NE;
 "while"         return WHILE;
-"do"			return DO;
-"for"			return FOR;
+"do"		return DO;
+"for"		return FOR;
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;
-"const" 		return CONST;
+"const" 	return CONST;
+"switch"        return SWITCH;
+"case"          return CASE;
+"default"       return DEFAULT;
+
 
 "int"           { yylval.iValue=0;
 		return INT_TYPE;

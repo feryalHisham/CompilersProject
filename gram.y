@@ -47,7 +47,7 @@ vector<pair<int,string>> errors;
 %token <fValue> FLOAT
 %token <bValue> BOOL
 %token <sValue> VARIABLE
-%token WHILE IF PRINT CONST DO FOR
+%token WHILE IF PRINT SWITCH CASE DEFAULT CONST DO FOR
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -58,7 +58,7 @@ vector<pair<int,string>> errors;
 %left '*' '/'
 %nonassoc UMINUS
 
-%type <nPtr> stmt declaration expr stmt_list
+%type <nPtr> stmt declaration expr stmt_list default_stmt case_stmt switch_stmt
 
 %%
 
@@ -67,9 +67,10 @@ program:
         ;
 
 function:
-          function stmt         { ex($2); freeNode($2); }
+          function stmt                             { ex($2); freeNode($2); }
         | /* NULL */
         ;
+
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration ';'                   { $$ = $1; }
@@ -80,12 +81,13 @@ stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | WHILE '(' expr ')' '{' stmt_list '}'   { $$ = opr(WHILE, 2, $3, $6); }
         | IF '(' expr ')' '{' stmt_list '}' %prec IFX {   $$ = opr(IF, 2, $3, $6); }
         | IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}' {  $$ = opr(IF, 3, $3, $6, $10); }
+        | switch_stmt                               {$$ = $1;}
         | '{' stmt_list '}'              { $$ = $2; }
         ;
 
 stmt_list:
-          stmt                  { $$ = $1; }
-        | stmt_list stmt        { $$ = opr(';', 2, $1, $2); }
+          stmt                                      { $$ = $1; }
+        | stmt_list stmt                            { $$ = opr(';', 2, $1, $2); }
         ;
 
 declaration:  
@@ -118,7 +120,21 @@ expr:
         | expr NE expr          { $$ = opr(NE, 2, $1, $3); }
         | expr EQ expr          { $$ = opr(EQ, 2, $1, $3); }
         | '(' expr ')'          { $$ = $2; }
+	;
+
+switch_stmt:
+        SWITCH '(' expr ')' '{' case_stmt default_stmt '}'      {$$ = opr(SWITCH,3,$3,$6,$7);}
         ;
+
+case_stmt:
+        CASE '(' expr ')' '{' stmt_list '}' case_stmt                {$$ = opr(CASE,3,$3,$6,$8);}
+        | CASE '(' expr ')' '{' stmt_list '}'                        {$$ = opr(CASE,2,$3,$6);}
+        ;
+
+default_stmt:
+        DEFAULT '{' stmt_list '}'                                     {$$ = opr(DEFAULT,1,$3);}
+        ;
+
 
 %%
 
@@ -216,6 +232,8 @@ nodeType *opr(int oper, int nops, ...) {
     p->type = typeOpr;
     p->opr.oper = oper;
     p->opr.nops = nops;
+
+    // p->opr.dummyName = (char*)"dummy";
 
     if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*' || p->opr.oper == '/' )
     	p->exType = typeMath;
