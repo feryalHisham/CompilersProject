@@ -1,2 +1,14 @@
-int x ;
+int x=3;
+int y;
+if(x>3)
+{
+ y=5;
+}
+else 
+{
+ x=6;
+ int z;
+z=3;
+}
+
 

@@ -92,7 +92,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 31 "gram.y" /* yacc.c:1909  */
+#line 35 "gram.y" /* yacc.c:1909  */
 
     int iValue;                 /* integer value */
     char sIndex;                /* symbol table index */

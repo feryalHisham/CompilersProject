@@ -11,9 +11,9 @@ Grammar
     5     | declaration ';'
     6     | declaration '=' expr ';'
     7     | VARIABLE '=' expr ';'
-    8     | WHILE '(' expr ')' stmt
-    9     | IF '(' expr ')' stmt
-   10     | IF '(' expr ')' stmt ELSE stmt
+    8     | WHILE '(' expr ')' '{' stmt_list '}'
+    9     | IF '(' expr ')' '{' stmt_list '}'
+   10     | IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}'
    11     | '{' stmt_list '}'
 
    12 stmt_list: stmt
@@ -56,8 +56,8 @@ $end (0) 0
 '<' (60) 28
 '=' (61) 6 7
 '>' (62) 29
-'{' (123) 11
-'}' (125) 11
+'{' (123) 8 9 10 11
+'}' (125) 8 9 10 11
 error (256)
 INTEGER (258) 18
 INT_TYPE (259) 14
@@ -89,9 +89,9 @@ program (35)
 function (36)
     on left: 2 3, on right: 1 2
 stmt (37)
-    on left: 4 5 6 7 8 9 10 11, on right: 2 8 9 10 12 13
+    on left: 4 5 6 7 8 9 10 11, on right: 2 12 13
 stmt_list (38)
-    on left: 12 13, on right: 11 13
+    on left: 12 13, on right: 8 9 10 11 13
 declaration (39)
     on left: 14 15 16 17, on right: 5 6
 expr (40)
@@ -181,15 +181,15 @@ State 8
 
 State 9
 
-    8 stmt: WHILE . '(' expr ')' stmt
+    8 stmt: WHILE . '(' expr ')' '{' stmt_list '}'
 
     '('  shift, and go to state 20
 
 
 State 10
 
-    9 stmt: IF . '(' expr ')' stmt
-   10     | IF . '(' expr ')' stmt ELSE stmt
+    9 stmt: IF . '(' expr ')' '{' stmt_list '}'
+   10     | IF . '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}'
 
     '('  shift, and go to state 21
 
@@ -289,7 +289,7 @@ State 19
 
 State 20
 
-    8 stmt: WHILE '(' . expr ')' stmt
+    8 stmt: WHILE '(' . expr ')' '{' stmt_list '}'
 
     INTEGER   shift, and go to state 22
     STRING    shift, and go to state 23
@@ -304,8 +304,8 @@ State 20
 
 State 21
 
-    9 stmt: IF '(' . expr ')' stmt
-   10     | IF '(' . expr ')' stmt ELSE stmt
+    9 stmt: IF '(' . expr ')' '{' stmt_list '}'
+   10     | IF '(' . expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}'
 
     INTEGER   shift, and go to state 22
     STRING    shift, and go to state 23
@@ -488,7 +488,7 @@ State 34
 
 State 35
 
-    8 stmt: WHILE '(' expr . ')' stmt
+    8 stmt: WHILE '(' expr . ')' '{' stmt_list '}'
    24 expr: expr . '+' expr
    25     | expr . '-' expr
    26     | expr . '*' expr
@@ -515,8 +515,8 @@ State 35
 
 State 36
 
-    9 stmt: IF '(' expr . ')' stmt
-   10     | IF '(' expr . ')' stmt ELSE stmt
+    9 stmt: IF '(' expr . ')' '{' stmt_list '}'
+   10     | IF '(' expr . ')' '{' stmt_list '}' ELSE '{' stmt_list '}'
    24 expr: expr . '+' expr
    25     | expr . '-' expr
    26     | expr . '*' expr
@@ -792,39 +792,17 @@ State 53
 
 State 54
 
-    8 stmt: WHILE '(' expr ')' . stmt
+    8 stmt: WHILE '(' expr ')' . '{' stmt_list '}'
 
-    INT_TYPE     shift, and go to state 4
-    FLOAT_TYPE   shift, and go to state 5
-    STRING_TYPE  shift, and go to state 6
-    BOOL_TYPE    shift, and go to state 7
-    VARIABLE     shift, and go to state 8
-    WHILE        shift, and go to state 9
-    IF           shift, and go to state 10
-    PRINT        shift, and go to state 11
-    '{'          shift, and go to state 12
-
-    stmt         go to state 68
-    declaration  go to state 14
+    '{'  shift, and go to state 68
 
 
 State 55
 
-    9 stmt: IF '(' expr ')' . stmt
-   10     | IF '(' expr ')' . stmt ELSE stmt
+    9 stmt: IF '(' expr ')' . '{' stmt_list '}'
+   10     | IF '(' expr ')' . '{' stmt_list '}' ELSE '{' stmt_list '}'
 
-    INT_TYPE     shift, and go to state 4
-    FLOAT_TYPE   shift, and go to state 5
-    STRING_TYPE  shift, and go to state 6
-    BOOL_TYPE    shift, and go to state 7
-    VARIABLE     shift, and go to state 8
-    WHILE        shift, and go to state 9
-    IF           shift, and go to state 10
-    PRINT        shift, and go to state 11
-    '{'          shift, and go to state 12
-
-    stmt         go to state 69
-    declaration  go to state 14
+    '{'  shift, and go to state 69
 
 
 State 56
@@ -1049,24 +1027,7 @@ State 67
 
 State 68
 
-    8 stmt: WHILE '(' expr ')' stmt .
-
-    $default  reduce using rule 8 (stmt)
-
-
-State 69
-
-    9 stmt: IF '(' expr ')' stmt .
-   10     | IF '(' expr ')' stmt . ELSE stmt
-
-    ELSE  shift, and go to state 70
-
-    $default  reduce using rule 9 (stmt)
-
-
-State 70
-
-   10 stmt: IF '(' expr ')' stmt ELSE . stmt
+    8 stmt: WHILE '(' expr ')' '{' . stmt_list '}'
 
     INT_TYPE     shift, and go to state 4
     FLOAT_TYPE   shift, and go to state 5
@@ -1078,12 +1039,137 @@ State 70
     PRINT        shift, and go to state 11
     '{'          shift, and go to state 12
 
-    stmt         go to state 71
+    stmt         go to state 30
+    stmt_list    go to state 70
+    declaration  go to state 14
+
+
+State 69
+
+    9 stmt: IF '(' expr ')' '{' . stmt_list '}'
+   10     | IF '(' expr ')' '{' . stmt_list '}' ELSE '{' stmt_list '}'
+
+    INT_TYPE     shift, and go to state 4
+    FLOAT_TYPE   shift, and go to state 5
+    STRING_TYPE  shift, and go to state 6
+    BOOL_TYPE    shift, and go to state 7
+    VARIABLE     shift, and go to state 8
+    WHILE        shift, and go to state 9
+    IF           shift, and go to state 10
+    PRINT        shift, and go to state 11
+    '{'          shift, and go to state 12
+
+    stmt         go to state 30
+    stmt_list    go to state 71
+    declaration  go to state 14
+
+
+State 70
+
+    8 stmt: WHILE '(' expr ')' '{' stmt_list . '}'
+   13 stmt_list: stmt_list . stmt
+
+    INT_TYPE     shift, and go to state 4
+    FLOAT_TYPE   shift, and go to state 5
+    STRING_TYPE  shift, and go to state 6
+    BOOL_TYPE    shift, and go to state 7
+    VARIABLE     shift, and go to state 8
+    WHILE        shift, and go to state 9
+    IF           shift, and go to state 10
+    PRINT        shift, and go to state 11
+    '{'          shift, and go to state 12
+    '}'          shift, and go to state 72
+
+    stmt         go to state 51
     declaration  go to state 14
 
 
 State 71
 
-   10 stmt: IF '(' expr ')' stmt ELSE stmt .
+    9 stmt: IF '(' expr ')' '{' stmt_list . '}'
+   10     | IF '(' expr ')' '{' stmt_list . '}' ELSE '{' stmt_list '}'
+   13 stmt_list: stmt_list . stmt
+
+    INT_TYPE     shift, and go to state 4
+    FLOAT_TYPE   shift, and go to state 5
+    STRING_TYPE  shift, and go to state 6
+    BOOL_TYPE    shift, and go to state 7
+    VARIABLE     shift, and go to state 8
+    WHILE        shift, and go to state 9
+    IF           shift, and go to state 10
+    PRINT        shift, and go to state 11
+    '{'          shift, and go to state 12
+    '}'          shift, and go to state 73
+
+    stmt         go to state 51
+    declaration  go to state 14
+
+
+State 72
+
+    8 stmt: WHILE '(' expr ')' '{' stmt_list '}' .
+
+    $default  reduce using rule 8 (stmt)
+
+
+State 73
+
+    9 stmt: IF '(' expr ')' '{' stmt_list '}' .
+   10     | IF '(' expr ')' '{' stmt_list '}' . ELSE '{' stmt_list '}'
+
+    ELSE  shift, and go to state 74
+
+    $default  reduce using rule 9 (stmt)
+
+
+State 74
+
+   10 stmt: IF '(' expr ')' '{' stmt_list '}' ELSE . '{' stmt_list '}'
+
+    '{'  shift, and go to state 75
+
+
+State 75
+
+   10 stmt: IF '(' expr ')' '{' stmt_list '}' ELSE '{' . stmt_list '}'
+
+    INT_TYPE     shift, and go to state 4
+    FLOAT_TYPE   shift, and go to state 5
+    STRING_TYPE  shift, and go to state 6
+    BOOL_TYPE    shift, and go to state 7
+    VARIABLE     shift, and go to state 8
+    WHILE        shift, and go to state 9
+    IF           shift, and go to state 10
+    PRINT        shift, and go to state 11
+    '{'          shift, and go to state 12
+
+    stmt         go to state 30
+    stmt_list    go to state 76
+    declaration  go to state 14
+
+
+State 76
+
+   10 stmt: IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list . '}'
+   13 stmt_list: stmt_list . stmt
+
+    INT_TYPE     shift, and go to state 4
+    FLOAT_TYPE   shift, and go to state 5
+    STRING_TYPE  shift, and go to state 6
+    BOOL_TYPE    shift, and go to state 7
+    VARIABLE     shift, and go to state 8
+    WHILE        shift, and go to state 9
+    IF           shift, and go to state 10
+    PRINT        shift, and go to state 11
+    '{'          shift, and go to state 12
+    '}'          shift, and go to state 77
+
+    stmt         go to state 51
+    declaration  go to state 14
+
+
+State 77
+
+   10 stmt: IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}' .
 
     $default  reduce using rule 10 (stmt)

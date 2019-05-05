@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include<bits/stdc++.h> 
 //#include "typesStructs.h"
 #include "compiler.h"
 #include <string.h>
@@ -24,8 +25,11 @@ char temp[]= "c";
 varData v;
 FILE * stderr;  // for logging errors
 void yyerror(std::string s);
+void checkForUnusedVariables();
+void yyerrorUnused(std::string,int lineNo);
+void printAllErrors();
 vector<map<string,varData>> sym;
-
+vector<pair<int,string>> errors;
 %}
 
 %union {
@@ -58,7 +62,7 @@ vector<map<string,varData>> sym;
 %%
 
 program:
-        function                { exit(0); }
+        function                { checkForUnusedVariables(); printAllErrors(); exit(0); }
         ;
 
 function:
@@ -70,10 +74,10 @@ stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration ';'                   { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
-        | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
-        | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
-        | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }
-        | '{' stmt_list '}'              { $$ = $2; }
+        | WHILE '(' expr ')' '{' stmt_list '}'   { $$ = opr(WHILE, 2, $3, $6); }
+        | IF '(' expr ')' '{' stmt_list '}' %prec IFX {   $$ = opr(IF, 2, $3, $6); }
+        | IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}' {  $$ = opr(IF, 3, $3, $6, $10); }
+        | '{' stmt_list '}'              {   $$ = $2; }
         ;
 
 stmt_list:
@@ -162,11 +166,12 @@ nodeType *id(char *s,conType vType) {
     }
 	// = y
     else if(vType == VAR_AS_EXPR)
-    {
-		if(existVar->initialized == false)
+    {		
+		/*if(existVar->initialized == false)
 			yyerror("Variable is not initialized.");
-		else
+		else*/
 			existVar->used = true; // Check this.
+		
     }
 
     /* copy information */
@@ -177,12 +182,13 @@ nodeType *id(char *s,conType vType) {
 
     if(existVar->null && vType < 4 ){
         varData var;
-		var.used = false;
-		var.initialized = false;
+	var.used = false;
+	var.initialized = false;
+	var.lineDeclared = yylineno;
         var.varType = vType;
         var.varName = s;
         var.null = false;
-		sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
+	sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
 
     }
     //fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
@@ -241,32 +247,54 @@ void freeNode(nodeType *p) {
 }
 
 void yyerror(std::string s) {
-    //fprintf(stdout, "%s\n", s);
-    fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
-    exit(0);
+    errors.push_back({yylineno,s});
+    //fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
+    // exit(0);
+}
+void yyerrorUnused(std::string error,int lineNo){
+        errors.push_back({lineNo,error});
+	//fprintf(stdout, "line %d %s\n",lineNo,error.c_str());
+	// exit(0);
+}
+void printAllErrors()
+{
+    sort(errors.begin(), errors.end()); 
+	for(int i=0;i<errors.size();i++)
+		{
+        	fprintf(stdout, "line %d: %s\n", errors[i].first, errors[i].second.c_str());
+		}
 }
 
 varData* findVar(string varName, bool searchParent){
 
     //printf("find var1\n");
     int depth = searchParent ? 0 : sym.size() -1;
-    for(int i=sym.size() -1; i >= 0; i--){  /*first search in the same scope*/
-    int size=sym[i].size();
+    for(int i=sym.size() -1; i >= depth; i--){  /*first search in the same scope*/
+    //int size=sym[i].size();
     //fprintf(stdout, "in for loop %d: %s\n",size , varName.c_str());
         if(sym[i].find(varName) != sym[i].end()) 
                 {
-					//printf("find var\n");
-					return &sym[i][varName];
+		//printf("find var\n");
+		return &sym[i][varName];
                 }
     }
     return &v; /*search in parent scope*/
 
 }
+void checkForUnusedVariables(){
+        // printf("ckeck\n");
+for (std::map<string,varData>::iterator it=sym[sym.size()-1].begin(); it!=sym[sym.size()-1].end(); ++it)
+    { 
+        //fprintf(stdout, "line %d %s\n",it->second.lineDeclared,it->second.varName);
+    	if(it->second.used == false)
+			yyerrorUnused("Variable is unused in this scope.",it->second.lineDeclared);
+	}
+}
 
 
 int main(void) {
     v.null = true;
-	sym.push_back(map<string,varData>());
+    sym.push_back(map<string,varData>());
     extern FILE * yyin;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
