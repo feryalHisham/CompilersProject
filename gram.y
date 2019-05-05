@@ -74,12 +74,12 @@ function:
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
         | declaration ';'                   { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
-        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
-        | DO '{'stmt'}' WHILE '(' expr ')' ';' { $$ = opr(DO, 2, $3, $7); }
-        | FOR '(' declaration '=' expr ';' expr ';' VARIABLE '=' expr  ')' '{' stmt '}'   { $$ = opr(FOR, 4, opr('=', 2, $3, $5), $7, opr('=', 2, id($9,VAR_AS_LVALUE), $11), $14); }
-        | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
-        | IF '(' expr ')' stmt %prec IFX { $$ = opr(IF, 2, $3, $5); }
-        | IF '(' expr ')' stmt ELSE stmt { $$ = opr(IF, 3, $3, $5, $7); }
+        | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE,false), $3); }
+        | DO '{' stmt_list '}' WHILE '(' expr ')' ';' { $$ = opr(DO, 2, $3, $7); }
+        | FOR '(' declaration '=' expr ';' expr ';' VARIABLE '=' expr  ')' '{' stmt_list '}'   { $$ = opr(FOR, 4, opr('=', 2, $3, $5), $7, opr('=', 2, id($9,VAR_AS_LVALUE,false), $11), $14); }
+        | WHILE '(' expr ')' '{' stmt_list '}'   { $$ = opr(WHILE, 2, $3, $6); }
+        | IF '(' expr ')' '{' stmt_list '}' %prec IFX {   $$ = opr(IF, 2, $3, $6); }
+        | IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}' {  $$ = opr(IF, 3, $3, $6, $10); }
         | '{' stmt_list '}'              { $$ = $2; }
         ;
 

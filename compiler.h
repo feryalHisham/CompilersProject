@@ -43,6 +43,14 @@ int ex(nodeType *p) {
             printf("\tjmp\tL%03d\n", lbl1);
             printf("L%03d:\n", lbl2);
             break;
+		case DO:
+			printf("L%03d:\n", lbl1 = lbl++);
+			ex(p->opr.op[0]);
+			ex(p->opr.op[1]);
+			printf("\tjz\tL%03d\n", lbl2 = lbl++);
+			printf("\tjmp\tL%03d\n", lbl1);
+			printf("L%03d:\n", lbl2);
+			break;
         case FOR:
             ex(p->opr.op[0]);
             printf("L%03d:\n", lbl1 = lbl++);
