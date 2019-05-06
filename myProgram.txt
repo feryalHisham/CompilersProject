@@ -1,12 +1,21 @@
-int x ;
-float y = 9 + 4.4 + x;
-float z = y + x  ;
+const float x = 3.4;
+int y = 9 + 4 + x;
 
-if(x>1 & x<2){
-x=x+1;
+
+
+int z =  y/x;
+
+switch(x){
+
+case(3){
+ string n = "noha";
 }
 
-string s = "home";
-string h = "kk";
-bool t = (3>5);
+case("heba"){
+ int c =0;
+}
 
+default{
+int v =9;
+}
+}

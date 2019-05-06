@@ -21,6 +21,7 @@ typedef struct {
 /* identifiers */
 typedef struct {
     char* keyName;                      /* subscript to sym array */
+	int vType;
 } idNodeType;
 
 /* operators */

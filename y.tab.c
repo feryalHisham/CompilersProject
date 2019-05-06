@@ -2005,15 +2005,17 @@ nodeType *id(char *s,conType vType,bool constant) {
     else if(vType == VAR_AS_EXPR)
     {
 		if(existVar->initialized == false)
-			yyerror("Variable is not initialized.");
-		else
+			yyerrorOveride("Variable is not initialized.");
+
 			existVar->used = true; // Check this.
+
     }
 
     /* copy information */
     p->type = typeId;
     p->id.keyName = s;
     p->exType = typeOther;
+    p->id.vType = vType;
 
 
     if(existVar->null && vType < 4 ){
@@ -2107,7 +2109,7 @@ void freeNode(nodeType *p) {
 
 void yyerror(std::string s) {
     //errors.push_back({yylineno,s});
-    fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
+    fprintf(stdout, "line %d: %s\n", yylineno-1, s.c_str());
     // exit(0);
 }
 void yyerrorOveride(std::string s) {
@@ -2199,56 +2201,24 @@ void compareType(int oper,nodeType *first, nodeType *second){
     if(oper == WHILE){
 
         if(firstType != typeBool){
-            yyerror("While argument must be of type Boolean");
+            yyerrorOveride("While argument must be of type Boolean");
         }
     }
 
     if(oper == IF){
 
         if(firstType != typeBool){
-            yyerror("if argument must be of type Boolean");
+            yyerrorOveride("if argument must be of type Boolean");
         }
     }
 
-    conType caseArgumentType;
-
-//
-//    if(oper == SWITCH){
-//
-//        if(first->type == typeCon){
-//            yyerror("switch argument cannot constant");
-//        }
-//
-//        else {
-//
-//
-//            while (second->opr.nops == 3) /*case then case*/{
-//                getNodeContype(&caseArgumentType,secondType,second->opr.op[0],NULL);
-//                second = second->opr.op[2];
-//                if(firstType != caseArgumentType){
-//                    yyerror(" switch argument and case argument mismatch");
-//                }
-//
-//            }
-//
-//            /*last case*/
-//
-//            getNodeContype(&caseArgumentType,secondType,second->opr.op[0],NULL);
-//            if(firstType != caseArgumentType){
-//                yyerror(" switch argument and case argument mismatch");
-//            }
-//
-//        }
-//
-//    }
-
     if(oper == UMINUS){
         if(firstType == typeString){
-            yyerror("Negation can't be applied on Strings");
+            yyerrorOveride("Negation can't be applied on Strings");
         }
 
         if(firstType == typeBool){
-            yyerror("Negation can't be applied on Boolean expressions");
+            yyerrorOveride("Negation can't be applied on Boolean expressions");
         }
 
     }
@@ -2259,31 +2229,31 @@ void compareType(int oper,nodeType *first, nodeType *second){
 
         if(firstType == typeString || secondType == typeString){
 
-            yyerror("Can't apply mathematical operations on Strings.");
+            yyerrorOveride("Can't apply mathematical operations on Strings.");
         }
 
         if(firstType == typeBool || secondType == typeBool){
-            yyerror("Can't apply mathematical operations on Boolean expressions.");
+            yyerrorOveride("Can't apply mathematical operations on Boolean expressions.");
         }
 
     }
     if( oper == '<' || oper == '>' || oper == GE || oper == LE  ){
 
         if(firstType == typeString || firstType == typeBool || secondType == typeString || secondType == typeBool )
-            yyerror(" Can't perform this comparison operation on a String or Boolean.");
+            yyerrorOveride(" Can't perform this comparison operation on a String or Boolean.");
     }
 
     if(oper == '&' || oper == '|'){
 
         if(firstType != typeBool || secondType != typeBool)
-            yyerror("Can't perform & operation or | operation on non Boolean.");
+            yyerrorOveride("Can't perform & operation or | operation on non Boolean.");
     }
 
     if(oper == EQ || oper == NE){
         if(firstType == typeString && secondType != typeString)
-            yyerror("Can't compare a String with a non String.");
+            yyerrorOveride("Can't compare a String with a non String.");
         if(firstType == typeBool && secondType != typeBool){
-            yyerror("Can't compare Boolean expression with non Boolean one.");
+            yyerrorOveride("Can't compare Boolean expression with non Boolean one.");
 
         }
     }
@@ -2291,7 +2261,7 @@ void compareType(int oper,nodeType *first, nodeType *second){
     if(oper == '='){
 
         if(firstType != secondType){
-            yyerror("Can't cast from one type to another");
+            yyerrorOveride("Can't cast from one type to another");
         }
     }
 
@@ -2339,18 +2309,21 @@ void handleAssignment(nodeType *p){
 
     //check constants
     char* s = p->opr.op[0]->id.keyName;
-    //if(s!=NULL){  /*why??*/
+
         string ss(s);
         varData *lvalue = findVar(ss,true);
+        if(lvalue->constant && p->opr.op[0]->id.vType == VAR_AS_LVALUE) {
+        yyerrorOveride("Can't change value of constant variable");
+        }
         lvalue->initialized = true;
-    //}
+
 
 }
 void handleDiv(nodeType *p){
     if(p->opr.op[1]->type == typeCon){
         if(p->opr.op[1]->con.conT == typeInt && p->opr.op[1]->con.valueInt == 0
         || p->opr.op[1]->con.conT == typeFloat && p->opr.op[1]->con.valueFloat == 0.0){
-            yyerror("Division by zero!");
+            yyerrorOveride("Division by zero!");
         }
     }
 }
