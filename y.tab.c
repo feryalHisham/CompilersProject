@@ -2031,7 +2031,6 @@ nodeType *id(char *s,conType vType,bool constant) {
 	sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
 
     }
-    //fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
     return p;
 }
 
@@ -2049,7 +2048,6 @@ nodeType *opr(int oper, int nops, ...) {
     p->opr.oper = oper;
     p->opr.nops = nops;
 
-    // p->opr.dummyName = (char*)"dummy";
 
     if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*' || p->opr.oper == '/' )
     	p->exType = typeMath;
@@ -2079,7 +2077,6 @@ nodeType *opr(int oper, int nops, ...) {
     if(p->opr.oper == '/'){
        handleDiv(p);
    }
-
     if(nops >1) {
         compareType(oper, p->opr.op[0], p->opr.op[1]);
     }
@@ -2088,7 +2085,6 @@ nodeType *opr(int oper, int nops, ...) {
     }
 
     setExprConType(p);
-//    printf("operation %c with type %d\n",oper,p->opr.operType);
 
     return p;
 }
@@ -2212,6 +2208,37 @@ void compareType(int oper,nodeType *first, nodeType *second){
         }
     }
 
+    conType caseArgumentType;
+
+
+    if(oper == SWITCH){
+        if(first->type == typeCon){
+            yyerrorOveride("switch argument cannot constant");
+        }
+
+        else {
+
+
+            while (second->opr.nops == 3) /*case then case*/{
+                getNodeContype(&caseArgumentType,&secondType,second->opr.op[0],NULL);
+                second = second->opr.op[2];
+                if(firstType != caseArgumentType){
+                    yyerrorOveride(" switch argument and case argument mismatch");
+                }
+
+            }
+
+            /*last case*/
+
+            getNodeContype(&caseArgumentType,&secondType,second->opr.op[0],NULL);
+            if(firstType != caseArgumentType){
+                yyerrorOveride(" switch argument and case argument mismatch");
+            }
+
+        }
+
+    }
+
     if(oper == UMINUS){
         if(firstType == typeString){
             yyerrorOveride("Negation can't be applied on Strings");
@@ -2283,8 +2310,13 @@ void setExprConType(nodeType * p){
 
     }
 
-    getNodeContype(&firstType,&secondType,(nodeType*)p->opr.op[0],(nodeType*)p->opr.op[1]);
+    if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*' || p->opr.oper == '/' || p->opr.oper == '<' || p->opr.oper == '>' || p->opr.oper == GE || p->opr.oper == LE ||
+       p->opr.oper == EQ || p->opr.oper == NE || p->opr.oper == '&' || p->opr.oper == '|'){
 
+        getNodeContype(&firstType,&secondType,(nodeType*)p->opr.op[0],(nodeType*)p->opr.op[1]);
+    }
+
+    else return;
 
     if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*') {
         if (firstType == typeFloat || secondType == typeFloat) {

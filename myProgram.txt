@@ -7,11 +7,11 @@ int z =  y/x;
 
 switch(x){
 
-case(3){
+case(3.5){
  string n = "noha";
 }
 
-case("heba"){
+case(3.4){
  int c =0;
 }
 
