@@ -18,6 +18,8 @@ using namespace std;
 "=="            return EQ;
 "!="            return NE;
 "while"         return WHILE;
+"do"			return DO;
+"for"			return FOR;
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;

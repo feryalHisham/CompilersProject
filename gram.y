@@ -47,7 +47,7 @@ vector<pair<int,string>> errors;
 %token <fValue> FLOAT
 %token <bValue> BOOL
 %token <sValue> VARIABLE
-%token WHILE IF PRINT CONST
+%token WHILE IF PRINT CONST DO FOR
 %nonassoc IFX
 %nonassoc ELSE
 
