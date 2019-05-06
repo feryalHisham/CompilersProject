@@ -6,6 +6,9 @@
 #include "y.tab.h"
 //int yylineno;
 void yyerror(std::string);
+void checkForUnusedVariables();
+void yyerrorUnused(std::string,int lineNo);
+using namespace std;
 %}
 
 %%
@@ -15,9 +18,16 @@ void yyerror(std::string);
 "=="            return EQ;
 "!="            return NE;
 "while"         return WHILE;
+"do"		return DO;
+"for"		return FOR;
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;
+"const" 	return CONST;
+"switch"        return SWITCH;
+"case"          return CASE;
+"default"       return DEFAULT;
+
 
 "int"           { yylval.iValue=0;
 		return INT_TYPE;
@@ -64,9 +74,20 @@ void yyerror(std::string);
 		return BOOL;
 		}
 
-[-()<>=+*/;{}.&|] {
-                return *yytext;
-             }
+[-()<>=+*/;.&|] {
+                    return *yytext;
+                  }
+
+[{]             {
+		sym.push_back(map<string,varData>());
+        return *yytext;
+		}
+[}]		{
+
+        checkForUnusedVariables();
+		sym.pop_back();
+        return *yytext;
+		}
 \"[^"\n]*["\n] {
 		yylval.sValue = strdup(yytext);
 		return STRING;
@@ -81,3 +102,5 @@ void yyerror(std::string);
 int yywrap(void) {
     return 1;
 }
+
+

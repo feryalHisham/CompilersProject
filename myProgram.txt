@@ -1,4 +1,4 @@
-int x = 3 + 5 ;
+int x ;
 float y = 9 + 4.4 + x;
 float z = y + x  ;
 
@@ -9,3 +9,4 @@ x=x+1;
 string s = "home";
 string h = "kk";
 bool t = (3>5);
+

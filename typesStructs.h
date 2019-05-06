@@ -45,19 +45,21 @@ typedef struct {
 	conType varType;
   	char* varName;
 	bool constant;
-        bool used;
+	bool used;
 	bool initialized;
-        bool null;
+	bool null;
+	int lineDeclared;
 	 union {
-    int valueInt;                  /* value of constant */
-    char* valueString;
-    float valueFloat;
-    bool valueBool;
-   };	
+        int valueInt;                  /* value of constant */
+        char* valueString;
+        float valueFloat;
+        bool valueBool;
+	 };
 } varData;
+
 
 
 extern std::vector<std::map<std::string,varData>> sym;
 extern int yylineno;
 extern varData v;
-
+extern std::vector<std::pair<int,std::string>> errors;

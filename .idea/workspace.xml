@@ -33,11 +33,19 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+<<<<<<< HEAD
       <file leaf-file-name="gram.y" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/gram.y">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="306">
               <caret line="53" column="6" lean-forward="false" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
+=======
+      <file leaf-file-name="gram.y" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/gram.y">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="115">
+              <caret line="105" column="9" lean-forward="true" selection-start-line="105" selection-start-column="9" selection-end-line="105" selection-end-column="9" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
               <folding />
             </state>
           </provider>
@@ -56,9 +64,17 @@
       <file leaf-file-name="y.tab.c" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/y.tab.c">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="1692">
               <caret line="94" column="4" lean-forward="false" selection-start-line="94" selection-start-column="4" selection-end-line="94" selection-end-column="4" />
               <folding />
+=======
+            <state relative-caret-position="1566">
+              <caret line="87" column="4" lean-forward="false" selection-start-line="87" selection-start-column="4" selection-end-line="87" selection-end-column="4" />
+              <folding>
+                <marker date="1556924295063" expanded="true" signature="61851:61881" ph="{...}" />
+              </folding>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
             </state>
           </provider>
         </entry>
@@ -66,8 +82,13 @@
       <file leaf-file-name="myProgram.txt" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/myProgram.txt">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="72">
               <caret line="4" column="14" lean-forward="true" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
+=======
+            <state relative-caret-position="324">
+              <caret line="18" column="16" lean-forward="true" selection-start-line="18" selection-start-column="16" selection-end-line="18" selection-end-column="16" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
               <folding />
             </state>
           </provider>
@@ -76,28 +97,49 @@
       <file leaf-file-name="pattern.l" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pattern.l">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="0">
               <caret line="45" column="13" lean-forward="true" selection-start-line="45" selection-start-column="13" selection-end-line="45" selection-end-column="13" />
+=======
+            <state relative-caret-position="18">
+              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
               <folding />
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file leaf-file-name="compiler.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/compiler.h">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="509">
               <caret line="89" column="37" lean-forward="false" selection-start-line="89" selection-start-column="37" selection-end-line="89" selection-end-column="37" />
+=======
+      <file leaf-file-name="pattern.l" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pattern.l">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="378">
+              <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
               <folding />
             </state>
           </provider>
         </entry>
       </file>
+<<<<<<< HEAD
       <file leaf-file-name="typesStructs.h" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/typesStructs.h">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-139">
               <caret line="23" column="13" lean-forward="true" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
+=======
+      <file leaf-file-name="compiler.h" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/compiler.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-1293">
+              <caret line="17" column="13" lean-forward="false" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
               <folding />
             </state>
           </provider>
@@ -114,6 +156,7 @@
       <find>yyin</find>
       <find>100</find>
       <find>printf</find>
+<<<<<<< HEAD
       <find>s</find>
       <find>sc</find>
       <find>scope</find>
@@ -123,6 +166,9 @@
       <find>= NULL</find>
       <find>con.conT</find>
       <find>con.valueInt</find>
+=======
+      <find>program</find>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
     </findStrings>
     <replaceStrings>
       <replace />
@@ -194,7 +240,7 @@
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../CompilersProject (switch-case)" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -403,17 +449,26 @@
       <option name="presentableId" value="Default" />
       <updated>1556646163267</updated>
       <workItem from="1556646164928" duration="30622000" />
+<<<<<<< HEAD
       <workItem from="1557144575970" duration="5434000" />
+=======
+      <workItem from="1556916422812" duration="11122000" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="61252000" />
+=======
+    <option name="totallyTimeSpent" value="44008000" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1533" height="875" extended-state="6" />
     <editor active="true" />
     <layout>
+<<<<<<< HEAD
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2528581" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32823366" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
@@ -429,6 +484,23 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+=======
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2528581" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32914925" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Data View" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32914925" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -449,7 +521,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-33">
           <caret line="86" column="22" lean-forward="true" selection-start-line="86" selection-start-column="22" selection-end-line="86" selection-end-column="22" />
+<<<<<<< HEAD
           <folding />
+=======
+          <folding>
+            <marker date="1556924295063" expanded="true" signature="61851:61881" ph="{...}" />
+          </folding>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
         </state>
       </provider>
     </entry>
@@ -518,7 +596,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="39">
           <caret line="90" column="22" lean-forward="true" selection-start-line="90" selection-start-column="22" selection-end-line="90" selection-end-column="22" />
+<<<<<<< HEAD
           <folding />
+=======
+          <folding>
+            <marker date="1556924295063" expanded="true" signature="61851:61881" ph="{...}" />
+          </folding>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
         </state>
       </provider>
     </entry>
@@ -602,7 +686,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-11589">
           <caret line="87" column="4" lean-forward="false" selection-start-line="87" selection-start-column="4" selection-end-line="87" selection-end-column="4" />
+<<<<<<< HEAD
           <folding />
+=======
+          <folding>
+            <marker date="1556924295063" expanded="true" signature="61851:61881" ph="{...}" />
+          </folding>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
         </state>
       </provider>
     </entry>
@@ -657,7 +747,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-11625">
           <caret line="85" column="4" lean-forward="false" selection-start-line="85" selection-start-column="4" selection-end-line="85" selection-end-column="4" />
+<<<<<<< HEAD
           <folding />
+=======
+          <folding>
+            <marker date="1556924295063" expanded="true" signature="61851:61881" ph="{...}" />
+          </folding>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
         </state>
       </provider>
     </entry>
@@ -724,9 +820,17 @@
     <entry file="file://$PROJECT_DIR$/symbolTable.cpp" />
     <entry file="file://$PROJECT_DIR$/y.tab.c">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="1692">
           <caret line="94" column="4" lean-forward="false" selection-start-line="94" selection-start-column="4" selection-end-line="94" selection-end-column="4" />
           <folding />
+=======
+        <state relative-caret-position="1566">
+          <caret line="87" column="4" lean-forward="false" selection-start-line="87" selection-start-column="4" selection-end-line="87" selection-end-column="4" />
+          <folding>
+            <marker date="1556924295063" expanded="true" signature="61851:61881" ph="{...}" />
+          </folding>
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
         </state>
       </provider>
     </entry>
@@ -737,17 +841,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/symbolTable.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/y.output">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-19779">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+<<<<<<< HEAD
+=======
         </state>
       </provider>
     </entry>
@@ -756,19 +855,42 @@
         <state relative-caret-position="180">
           <caret line="10" column="25" lean-forward="false" selection-start-line="10" selection-start-column="25" selection-end-line="10" selection-end-column="25" />
           <folding />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pattern.l">
+    <entry file="file://$PROJECT_DIR$/symbolTable.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
-          <caret line="45" column="13" lean-forward="true" selection-start-line="45" selection-start-column="13" selection-end-line="45" selection-end-column="13" />
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/typesStructs.h">
       <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="18">
+          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pattern.l">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="0">
+          <caret line="45" column="13" lean-forward="true" selection-start-line="45" selection-start-column="13" selection-end-line="45" selection-end-column="13" />
+=======
+        <state relative-caret-position="378">
+          <caret line="23" column="0" lean-forward="false" selection-start-line="23" selection-start-column="0" selection-end-line="23" selection-end-column="0" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/compiler.h">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="-139">
           <caret line="23" column="13" lean-forward="true" selection-start-line="23" selection-start-column="13" selection-end-line="23" selection-end-column="13" />
           <folding />
@@ -779,22 +901,38 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="509">
           <caret line="89" column="37" lean-forward="false" selection-start-line="89" selection-start-column="37" selection-end-line="89" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gram.y">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="53" column="6" lean-forward="false" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
+=======
+        <state relative-caret-position="-1293">
+          <caret line="17" column="13" lean-forward="false" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/myProgram.txt">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="306">
+          <caret line="53" column="6" lean-forward="false" selection-start-line="53" selection-start-column="6" selection-end-line="53" selection-end-column="6" />
+=======
+        <state relative-caret-position="324">
+          <caret line="18" column="16" lean-forward="true" selection-start-line="18" selection-start-column="16" selection-end-line="18" selection-end-column="16" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
+          <folding />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/myProgram.txt">
+      <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="72">
           <caret line="4" column="14" lean-forward="true" selection-start-line="4" selection-start-column="14" selection-end-line="4" selection-end-column="14" />
+=======
+    <entry file="file://$PROJECT_DIR$/gram.y">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="105" column="9" lean-forward="true" selection-start-line="105" selection-start-column="9" selection-end-line="105" selection-end-column="9" />
+>>>>>>> 105d0da7edf9e0dacfdc7084f4b318df9b8d85fe
           <folding />
         </state>
       </provider>

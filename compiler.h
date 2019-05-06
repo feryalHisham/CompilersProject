@@ -4,14 +4,18 @@
 #include "y.tab.h"
 
 static int lbl;
+static int caselbl;
+static int switchlbl;
+static int deflbl;
 
 int ex(nodeType *p) {
     int lbl1, lbl2;
-    
+    int caselbl1,caselbl2;
 
-    if (!p) return 0;
 
-  
+
+    if (!p) { return 0;}
+
     switch(p->type) {
     case typeCon: 
 		switch(p->con.conT){
@@ -40,6 +44,24 @@ int ex(nodeType *p) {
             ex(p->opr.op[0]);
             printf("\tjz\tL%03d\n", lbl2 = lbl++);
             ex(p->opr.op[1]);
+            printf("\tjmp\tL%03d\n", lbl1);
+            printf("L%03d:\n", lbl2);
+            break;
+		case DO:
+			printf("L%03d:\n", lbl1 = lbl++);
+			ex(p->opr.op[0]);
+			ex(p->opr.op[1]);
+			printf("\tjz\tL%03d\n", lbl2 = lbl++);
+			printf("\tjmp\tL%03d\n", lbl1);
+			printf("L%03d:\n", lbl2);
+			break;
+        case FOR:
+            ex(p->opr.op[0]);
+            printf("L%03d:\n", lbl1 = lbl++);
+            ex(p->opr.op[1]);
+            printf("\tjz\tL%03d\n", lbl2 = lbl++);
+            ex(p->opr.op[3]);
+            ex(p->opr.op[2]);
             printf("\tjmp\tL%03d\n", lbl1);
             printf("L%03d:\n", lbl2);
             break;
@@ -72,6 +94,30 @@ int ex(nodeType *p) {
             ex(p->opr.op[0]);
             printf("\tneg\n");
             break;
+        case SWITCH:
+            ex(p->opr.op[0]); /*expression of switch*/
+            ex(p->opr.op[1]); /*first case*/
+            printf("defaultL%03d:\n",deflbl++);
+            ex(p->opr.op[2]); /*default block code*/
+            printf("switchL%03d:\n",switchlbl++);
+            break;
+        case CASE:
+            ex(p->opr.op[0]); /*expression of case*/
+            printf("\tcompEQ\n");
+            printf("\tjnz\tcaseL%03d\n",caselbl1 = caselbl++);
+            if(p->opr.nops == 3){
+                ex(p->opr.op[2]);
+            }
+            else{
+                printf("\tjmp\tdefaultL%03d\n",deflbl);
+            }
+            printf("caseL%03d:\n",caselbl1);
+            ex(p->opr.op[1]); /*case block code*/
+            printf("\tjmp\tswitchL%03d\n",switchlbl);
+            break;
+		case DEFAULT:
+			ex(p->opr.op[0]);
+			break;
         default:
             ex(p->opr.op[0]);
             ex(p->opr.op[1]);
