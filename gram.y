@@ -16,6 +16,11 @@ nodeType *opr(int oper, int nops, ...);
 nodeType *id(char *s,conType vType);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
 varData *findVar(string varName, bool searchParent);
+void setExprConType(nodeType * p);
+void getNodeContype(conType *firstType,conType *secondType,nodeType *first, nodeType *second);
+void compareType(int oper,nodeType *first, nodeType *second);
+void handleAssignment(nodeType *p);
+void handleDiv(nodeType *p);
 void freeNode(nodeType *p);
 //int ex(nodeType *p);
 int yylex(void);
@@ -46,8 +51,8 @@ vector<map<string,varData>> sym;
 %nonassoc IFX
 %nonassoc ELSE
 
-
-
+%left '|'
+%left '&'
 %left GE LE EQ NE '>' '<'
 %left '+' '-'
 %left '*' '/'
@@ -67,7 +72,7 @@ function:
         ;
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
-        | declaration ';'                   { $$ = $1; }
+        | declaration ';'              { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
         | WHILE '(' expr ')' stmt        { $$ = opr(WHILE, 2, $3, $5); }
@@ -106,6 +111,8 @@ expr:
         | expr LE expr          { $$ = opr(LE, 2, $1, $3); }
         | expr NE expr          { $$ = opr(NE, 2, $1, $3); }
         | expr EQ expr          { $$ = opr(EQ, 2, $1, $3); }
+        | expr '&' expr         { $$ = opr('&', 2, $1, $3); }
+        | expr '|' expr         { $$ = opr('|', 2, $1, $3); }
         | '(' expr ')'          { $$ = $2; }
         ;
 
@@ -205,7 +212,8 @@ nodeType *opr(int oper, int nops, ...) {
 
     if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*' || p->opr.oper == '/' )
     	p->exType = typeMath;
-    else if(p->opr.oper == '<' || p->opr.oper == '>' || p->opr.oper == GE || p->opr.oper == LE ||  p->opr.oper == NE ||  p->opr.oper == EQ )
+    else if(p->opr.oper == '<' || p->opr.oper == '>' || p->opr.oper == GE
+            || p->opr.oper == LE ||  p->opr.oper == NE ||  p->opr.oper == EQ )
 	p->exType = typeLog;
     else
 	p->exType = typeOther;
@@ -220,9 +228,27 @@ nodeType *opr(int oper, int nops, ...) {
 	   if(p->opr.op[i]->exType == typeLog)
 		yyerror("Can't include non Mathematical expression.");
 	}
-
     va_end(ap);
-    //printf("opr\n");
+
+
+    if(p->opr.oper == '=') {
+        handleAssignment(p);
+    }
+
+//    if(p->opr.oper == '/'){
+//       handleDiv(p);
+//    }
+
+    if(nops >1) {
+        compareType(oper, p->opr.op[0], p->opr.op[1]);
+    }
+    if(nops ==1) {
+        compareType(oper, p->opr.op[0], NULL);
+    }
+
+    setExprConType(p);
+//    printf("operation %c with type %d\n",oper,p->opr.operType);
+
     return p;
 }
 
@@ -261,6 +287,217 @@ varData* findVar(string varName, bool searchParent){
     }
     return &v; /*search in parent scope*/
 
+}
+
+void getNodeContype(conType *firstType,conType *secondType,nodeType *first, nodeType *second){
+
+    switch (first->type) {
+        case typeCon: {
+            *firstType = first->con.conT;
+            break;
+        }
+        case typeId: {
+            string ss(first->id.keyName);
+            *firstType = findVar(ss, true)->varType;
+            break;
+        }
+        default: /*case typeOpr*/{
+            *firstType = first->opr.operType;
+            break;
+        }
+    }
+
+    if(second != NULL) {
+        switch (second->type) {
+            case typeCon: {
+                *secondType = second->con.conT;
+                break;
+            }
+            case typeId: {
+                string ss(second->id.keyName);
+                *secondType = findVar(ss, true)->varType;
+                break;
+            }
+            default: {/*case typeOpr*/
+                *secondType = second->opr.operType;
+                break;
+            }
+        }
+    }
+}
+
+/**
+ * Compares the types of two nodes taking into consideration the operation
+ * @param oper operation performed on the nodes
+ * @param first one of the operands
+ * @param second the other operand
+ */
+
+void compareType(int oper,nodeType *first, nodeType *second){
+
+    conType firstType;
+    conType secondType;
+
+    getNodeContype(&firstType,&secondType,first,NULL);
+
+    if(oper == WHILE){
+
+        if(firstType != typeBool){
+            yyerror("While argument must be of type Boolean");
+        }
+    }
+
+    if(oper == IF){
+
+        if(firstType != typeBool){
+            yyerror("if argument must be of type Boolean");
+        }
+    }
+
+    conType caseArgumentType;
+
+//
+//    if(oper == SWITCH){
+//
+//        if(first->type == typeCon){
+//            yyerror("switch argument cannot constant");
+//        }
+//
+//        else {
+//
+//
+//            while (second->opr.nops == 3) /*case then case*/{
+//                getNodeContype(&caseArgumentType,secondType,second->opr.op[0],NULL);
+//                second = second->opr.op[2];
+//                if(firstType != caseArgumentType){
+//                    yyerror(" switch argument and case argument mismatch");
+//                }
+//
+//            }
+//
+//            /*last case*/
+//
+//            getNodeContype(&caseArgumentType,secondType,second->opr.op[0],NULL);
+//            if(firstType != caseArgumentType){
+//                yyerror(" switch argument and case argument mismatch");
+//            }
+//
+//        }
+//
+//    }
+
+    if(oper == UMINUS){
+        if(firstType == typeString){
+            yyerror("Negation can't be applied on Strings");
+        }
+
+        if(firstType == typeBool){
+            yyerror("Negation can't be applied on Boolean expressions");
+        }
+
+    }
+
+    getNodeContype(&firstType,&secondType,first,second);
+
+    if(oper == '+' || oper == '-' || oper == '*' || oper == '/'){
+
+        if(firstType == typeString || secondType == typeString){
+
+            yyerror("Can't apply mathematical operations on Strings.");
+        }
+
+        if(firstType == typeBool || secondType == typeBool){
+            yyerror("Can't apply mathematical operations on Boolean expressions.");
+        }
+
+    }
+    if( oper == '<' || oper == '>' || oper == GE || oper == LE  ){
+
+        if(firstType == typeString || firstType == typeBool || secondType == typeString || secondType == typeBool )
+            yyerror(" Can't perform this comparison operation on a String or Boolean.");
+    }
+
+    if(oper == '&' || oper == '|'){
+
+        if(firstType != typeBool || secondType != typeBool)
+            yyerror("Can't perform & operation or | operation on non Boolean.");
+    }
+
+    if(oper == EQ || oper == NE){
+        if(firstType == typeString && secondType != typeString)
+            yyerror("Can't compare a String with a non String.");
+        if(firstType == typeBool && secondType != typeBool){
+            yyerror("Can't compare Boolean expression with non Boolean one.");
+
+        }
+    }
+
+    if(oper == '='){
+
+        if(firstType != secondType){
+            yyerror("Can't cast from one type to another");
+        }
+    }
+
+
+}
+
+
+void setExprConType(nodeType * p){
+
+
+    conType firstType;
+    conType secondType;
+
+    if(p->opr.oper == UMINUS) {
+
+        getNodeContype(&firstType,&secondType,p->opr.op[0],NULL);
+        p->opr.operType = firstType;
+        return;
+
+    }
+
+    getNodeContype(&firstType,&secondType,(nodeType*)p->opr.op[0],(nodeType*)p->opr.op[1]);
+
+
+    if(p->opr.oper == '+' || p->opr.oper == '-' || p->opr.oper == '*') {
+        if (firstType == typeFloat || secondType == typeFloat) {
+            p->opr.operType = typeFloat;
+        }
+        else p->opr.operType = typeInt;
+        }
+
+    else if( p->opr.oper == '/') p->opr.operType = typeFloat;
+
+    else if( p->opr.oper == '<' || p->opr.oper == '>' || p->opr.oper == GE || p->opr.oper == LE ||
+            p->opr.oper == EQ || p->opr.oper == NE || p->opr.oper == '&' || p->opr.oper == '|')
+    {
+        p->opr.operType = typeBool;
+    }
+
+
+    return;
+}
+
+void handleAssignment(nodeType *p){
+
+    //check constants
+    nodeTypeTag *pid = p->opr.op[0];
+    char* s = p->opr.op[0]->id.keyName;
+    if(s!=NULL){  /*why??*/
+        string ss(s);
+        varData *lvalue = findVar(ss,true);
+        lvalue->initialized = true;
+    }
+
+}
+void handleDiv(nodeType *p){
+    if(p->opr.op[1]->type == typeCon){
+        if(p->opr.op[1]->con.conT == typeInt && p->opr.op[1]->con.valueInt == 0
+        || p->opr.op[1]->con.conT == typeFloat && p->opr.op[1]->con.valueFloat == 0.0){
+            yyerror("Division by zero!");
+        }
+    }
 }
 
 

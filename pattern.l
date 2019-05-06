@@ -64,7 +64,7 @@ void yyerror(std::string);
 		return BOOL;
 		}
 
-[-()<>=+*/;{}.] {
+[-()<>=+*/;{}.&|] {
                 return *yytext;
              }
 \"[^"\n]*["\n] {

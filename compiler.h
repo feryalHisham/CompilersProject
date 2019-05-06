@@ -86,6 +86,9 @@ int ex(nodeType *p) {
             case LE:    printf("\tcompLE\n"); break;
             case NE:    printf("\tcompNE\n"); break;
             case EQ:    printf("\tcompEQ\n"); break;
+            case '&':    printf("\tand\n"); break;
+            case '|':    printf("\tor\n"); break;
+
             }
         }
     }
