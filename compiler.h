@@ -53,8 +53,13 @@ int ex(nodeType *p) {
             break;
         case FOR:
             ex(p->opr.op[0]);
-            // ex(p->opr.op[1]);
+            printf("L%03d:\n", lbl1 = lbl++);
+            ex(p->opr.op[1]);
+            printf("\tjz\tL%03d\n", lbl2 = lbl++);
+            ex(p->opr.op[3]);
+            ex(p->opr.op[2]);
             printf("\tjmp\tL%03d\n", lbl1);
+            printf("L%03d:\n", lbl2);
             break;
         case IF:
             ex(p->opr.op[0]);
