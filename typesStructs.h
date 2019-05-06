@@ -47,6 +47,7 @@ typedef struct {
         bool used;
 	bool initialized;
         bool null;
+        int lineDeclared;
 	 union {
     int valueInt;                  /* value of constant */
     char* valueString;
@@ -59,4 +60,4 @@ typedef struct {
 extern std::vector<std::map<std::string,varData>> sym;
 extern int yylineno;
 extern varData v;
-
+extern std::vector<std::pair<int,std::string>> errors;

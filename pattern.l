@@ -6,6 +6,9 @@
 #include "y.tab.h"
 //int yylineno;
 void yyerror(std::string);
+void checkForUnusedVariables();
+void yyerrorUnused(std::string,int lineNo);
+using namespace std;
 %}
 
 %%
@@ -14,12 +17,11 @@ void yyerror(std::string);
 "<="            return LE;
 "=="            return EQ;
 "!="            return NE;
-"do"         	return DO;
-"for"			return FOR;
 "while"         return WHILE;
 "if"            return IF;
 "else"          return ELSE;
 "print"         return PRINT;
+"const" 		return CONST;
 
 "int"           { yylval.iValue=0;
 		return INT_TYPE;
@@ -66,9 +68,23 @@ void yyerror(std::string);
 		return BOOL;
 		}
 
-[-()<>=+*/;{}.] {
+[-()<>=+*/;.] {
+                //fprintf(stdout, "pattern %s\n", yytext);
                 return *yytext;
              }
+[{]             {
+		sym.push_back(map<string,varData>());
+		//int size = sym[sym.size()-1].size();
+                //fprintf(stdout, "pattern %s %d\n", yytext,size);
+                return *yytext;
+		}
+[}]		{
+		//int size = sym[sym.size()-1].size();
+                //fprintf(stdout, "pattern %s %d\n", yytext,size);
+                checkForUnusedVariables();
+		sym.pop_back();
+                return *yytext;
+		}
 \"[^"\n]*["\n] {
 		yylval.sValue = strdup(yytext);
 		return STRING;
@@ -83,3 +99,5 @@ void yyerror(std::string);
 int yywrap(void) {
     return 1;
 }
+
+

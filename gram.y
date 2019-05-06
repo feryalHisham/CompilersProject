@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include<bits/stdc++.h> 
 //#include "typesStructs.h"
 #include "compiler.h"
 #include <string.h>
@@ -13,7 +14,7 @@ using namespace std;
 
 /* prototypes */
 nodeType *opr(int oper, int nops, ...);
-nodeType *id(char *s,conType vType);
+nodeType *id(char *s,conType vType,bool constant);
 nodeType *con(int valI,float valF,char* valS,bool valB, conType conT);
 varData *findVar(string varName, bool searchParent);
 void freeNode(nodeType *p);
@@ -24,8 +25,12 @@ char temp[]= "c";
 varData v;
 FILE * stderr;  // for logging errors
 void yyerror(std::string s);
+void yyerrorOveride(std::string s);
+void checkForUnusedVariables();
+void yyerrorUnused(std::string,int lineNo);
+void printAllErrors();
 vector<map<string,varData>> sym;
-
+vector<pair<int,string>> errors;
 %}
 
 %union {
@@ -42,7 +47,7 @@ vector<map<string,varData>> sym;
 %token <fValue> FLOAT
 %token <bValue> BOOL
 %token <sValue> VARIABLE
-%token WHILE IF PRINT DO FOR
+%token WHILE IF PRINT CONST
 %nonassoc IFX
 %nonassoc ELSE
 
@@ -58,7 +63,7 @@ vector<map<string,varData>> sym;
 %%
 
 program:
-        function                { exit(0); }
+        function                { checkForUnusedVariables(); printAllErrors(); exit(0); }
         ;
 
 function:
@@ -67,7 +72,7 @@ function:
         ;
 
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
-        | declaration                  { $$ = $1; }
+        | declaration ';'                   { $$ = $1; }
 	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE), $3); }
         | DO '{'stmt'}' WHILE '(' expr ')' ';' { $$ = opr(DO, 2, $3, $7); }
@@ -84,14 +89,15 @@ stmt_list:
         ;
 
 declaration:  
-			 INT_TYPE VARIABLE     { $$ = id($2,typeInt);}
-			| INT_TYPE VARIABLE ';' { $$ = id($2,typeInt);}
-			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat);}
-			| FLOAT_TYPE VARIABLE ';' { $$ = id($2,typeFloat);}
-			| STRING_TYPE VARIABLE { $$ = id($2,typeString);}
-			| STRING_TYPE VARIABLE ';' { $$ = id($2,typeString);}
-			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool);}
-			| BOOL_TYPE VARIABLE ';' { $$ = id($2,typeBool);}
+			 
+			 INT_TYPE VARIABLE  { $$ = id($2,typeInt,false);}
+            | CONST INT_TYPE VARIABLE  { $$ = id($3,typeInt,true);}
+			| FLOAT_TYPE VARIABLE { $$ = id($2,typeFloat,false);}
+			| CONST FLOAT_TYPE VARIABLE { $$ = id($3,typeFloat,true);}
+			| STRING_TYPE VARIABLE { $$ = id($2,typeString,false);}
+			| CONST STRING_TYPE VARIABLE { $$ = id($3,typeString,true);}
+			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool,false);}
+			| CONST BOOL_TYPE VARIABLE  { $$ = id($3,typeBool,true);}
 	          ;     
 
 expr:
@@ -99,7 +105,7 @@ expr:
 		| FLOAT 				{ $$ = con(0, $1,temp, true, typeFloat); }
 		| STRING				{ $$ = con(0, 0.0, $1, true, typeString); }
 		| BOOL					{ $$ = con(0, 0.0, temp, $1, typeBool); }
-        | VARIABLE              { $$ = id($1,VAR_AS_EXPR); }
+        | VARIABLE              { $$ = id($1,VAR_AS_EXPR,false); }
         | '-' expr %prec UMINUS { $$ = opr(UMINUS, 1, $2); }
         | expr '+' expr         { $$ = opr('+', 2, $1, $3); }
         | expr '-' expr         { $$ = opr('-', 2, $1, $3); }
@@ -122,7 +128,7 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+        yyerrorOveride("out of memory");
 
     /* copy information */
     p->type = typeCon;
@@ -147,31 +153,32 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
     return p;
 }
 
-nodeType *id(char *s,conType vType) {
+nodeType *id(char *s,conType vType,bool constant) {
     nodeType *p;
 
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
-        yyerror("out of memory");
+        yyerrorOveride("out of memory");
     
     string ss(s);
     
     varData* existVar = findVar(ss,vType >= 4);
     
     if(existVar->null != true && vType < 4) { 
-        yyerror("Variable declared before.");
+        yyerrorOveride("Variable declared before.");
     }
 	// x = y;
     if(existVar->null && vType >= 4 ){
-        yyerror("Variable is not declared.");
+        yyerrorOveride("Variable is not declared.");
     }
 	// = y
     else if(vType == VAR_AS_EXPR)
-    {
-		if(existVar->initialized == false)
-			yyerror("Variable is not initialized.");
-		else
+    {		
+		/*if(existVar->initialized == false)
+			yyerrorOveride("Variable is not initialized.");
+		else*/
 			existVar->used = true; // Check this.
+		
     }
 
     /* copy information */
@@ -181,13 +188,15 @@ nodeType *id(char *s,conType vType) {
 
 
     if(existVar->null && vType < 4 ){
-        varData var;
-		var.used = false;
-		var.initialized = false;
-        var.varType = vType;
-        var.varName = s;
-        var.null = false;
-		sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
+    varData var;
+	var.used = false;
+	var.initialized = false;
+	var.constant = constant;
+	var.lineDeclared = yylineno;
+    var.varType = vType;
+    var.varName = s;
+    var.null = false;
+	sym[sym.size()-1].insert(std::pair<string,varData>(ss,var));
 
     }
     //fprintf(stdout, "after set %d: %s\n", yylineno, sym[sym.size()-1][s].varName);
@@ -201,7 +210,7 @@ nodeType *opr(int oper, int nops, ...) {
 
     /* allocate node, extending op array */
     if ((p = (nodeType *)malloc(sizeof(nodeType) + (nops-1) * sizeof(nodeType *))) == NULL)
-        yyerror("out of memory");
+        yyerrorOveride("out of memory");
 
     /* copy information */
     p->type = typeOpr;
@@ -223,7 +232,7 @@ nodeType *opr(int oper, int nops, ...) {
 	{
     	for (i = 0; i < nops; i++)
 	   if(p->opr.op[i]->exType == typeLog)
-		yyerror("Can't include non Mathematical expression.");
+		yyerrorOveride("Can't include non Mathematical expression.");
 	}
 
     va_end(ap);
@@ -246,32 +255,58 @@ void freeNode(nodeType *p) {
 }
 
 void yyerror(std::string s) {
-    //fprintf(stdout, "%s\n", s);
+    //errors.push_back({yylineno,s});
     fprintf(stdout, "line %d: %s\n", yylineno, s.c_str());
-    exit(0);
+    // exit(0);
+}
+void yyerrorOveride(std::string s) {
+    errors.push_back({yylineno,s});
+    // exit(0);
+}
+void yyerrorUnused(std::string error,int lineNo){
+        errors.push_back({lineNo,error});
+	//fprintf(stdout, "line %d %s\n",lineNo,error.c_str());
+	// exit(0);
+}
+void printAllErrors()
+{
+    sort(errors.begin(), errors.end()); 
+	for(int i=0;i<errors.size();i++)
+		{
+        	fprintf(stdout, "line %d: %s\n", errors[i].first, errors[i].second.c_str());
+		}
 }
 
 varData* findVar(string varName, bool searchParent){
 
     //printf("find var1\n");
     int depth = searchParent ? 0 : sym.size() -1;
-    for(int i=sym.size() -1; i >= 0; i--){  /*first search in the same scope*/
-    int size=sym[i].size();
+    for(int i=sym.size() -1; i >= depth; i--){  /*first search in the same scope*/
+    //int size=sym[i].size();
     //fprintf(stdout, "in for loop %d: %s\n",size , varName.c_str());
         if(sym[i].find(varName) != sym[i].end()) 
                 {
-					//printf("find var\n");
-					return &sym[i][varName];
+		//printf("find var\n");
+		return &sym[i][varName];
                 }
     }
     return &v; /*search in parent scope*/
 
 }
+void checkForUnusedVariables(){
+        // printf("ckeck\n");
+for (std::map<string,varData>::iterator it=sym[sym.size()-1].begin(); it!=sym[sym.size()-1].end(); ++it)
+    { 
+        //fprintf(stdout, "line %d %s\n",it->second.lineDeclared,it->second.varName);
+    	if(it->second.used == false)
+			yyerrorUnused("Variable is unused in this scope.",it->second.lineDeclared);
+	}
+}
 
 
 int main(void) {
     v.null = true;
-	sym.push_back(map<string,varData>());
+    sym.push_back(map<string,varData>());
     extern FILE * yyin;
     yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
     yyparse();
