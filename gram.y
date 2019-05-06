@@ -201,9 +201,10 @@ nodeType *id(char *s,conType vType,bool constant) {
     else if(vType == VAR_AS_EXPR)
     {
 		if(existVar->initialized == false)
-			yyerror("Variable is not initialized.");
-		else
+			yyerrorOveride("Variable is not initialized.");
+
 			existVar->used = true; // Check this.
+
     }
 
     /* copy information */
@@ -408,35 +409,35 @@ void compareType(int oper,nodeType *first, nodeType *second){
 
     conType caseArgumentType;
 
-//
-//    if(oper == SWITCH){
-//
-//        if(first->type == typeCon){
-//            yyerror("switch argument cannot constant");
-//        }
-//
-//        else {
-//
-//
-//            while (second->opr.nops == 3) /*case then case*/{
-//                getNodeContype(&caseArgumentType,secondType,second->opr.op[0],NULL);
-//                second = second->opr.op[2];
-//                if(firstType != caseArgumentType){
-//                    yyerror(" switch argument and case argument mismatch");
-//                }
-//
-//            }
-//
-//            /*last case*/
-//
-//            getNodeContype(&caseArgumentType,secondType,second->opr.op[0],NULL);
-//            if(firstType != caseArgumentType){
-//                yyerror(" switch argument and case argument mismatch");
-//            }
-//
-//        }
-//
-//    }
+
+    if(oper == SWITCH){
+
+        if(first->type == typeCon){
+            yyerror("switch argument cannot constant");
+        }
+
+        else {
+
+
+            while (second->opr.nops == 3) /*case then case*/{
+                getNodeContype(&caseArgumentType,&secondType,second->opr.op[0],NULL);
+                second = second->opr.op[2];
+                if(firstType != caseArgumentType){
+                    yyerror(" switch argument and case argument mismatch");
+                }
+
+            }
+
+            /*last case*/
+
+            getNodeContype(&caseArgumentType,&secondType,second->opr.op[0],NULL);
+            if(firstType != caseArgumentType){
+                yyerror(" switch argument and case argument mismatch");
+            }
+
+        }
+
+    }
 
     if(oper == UMINUS){
         if(firstType == typeString){
