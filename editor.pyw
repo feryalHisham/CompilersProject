@@ -161,6 +161,26 @@ class Editor:
         file.write(codeTxt)
         file.close()
         os.system("./compiler.out myProgram1.txt > output.txt || echo \"can't find file\"")
+        
+        file_dir = "output.txt"
+        if file_dir:
+            try:
+                # Open the file.
+                file = open(file_dir)
+                
+                # Create a new tab.
+                new_tab = ttk.Frame(self.nb)
+                self.tabs[ new_tab ] = Document(new_tab, self.create_text_widget(new_tab), file_dir)
+                self.nb.add(new_tab, text=os.path.basename(file_dir))
+                self.nb.select( new_tab )
+                            
+                # Puts the contents of the file into the text widget.
+                self.tabs[ new_tab ].textbox.insert('end', file.read())
+                
+                # Update hash
+                self.tabs[ new_tab ].status = md5(tabs[ new_tab ].textbox.get(1.0, 'end').encode('utf-8'))
+            except:
+                return
         return
 
                 
