@@ -8,4 +8,4 @@ y.tab.c: gram.y
 	yacc -d -v -t gram.y
 
 clean: 
-	rm -rf lex.yy.c y.tab.c y.tab.h y.output
+	rm -rf lex.yy.c y.tab.c y.tab.h y.output compiler.out
