@@ -6,12 +6,7 @@ For Ubuntu: sudo apt install bison flex
 
 To run:
 
-yacc -d gram.y
+make
 
-lex pattern.l
-
-cc lex.yy.c y.tab.c compiler.c -o compiler.out
-
-./compiler.out
-
-The source code is provided in myProgram.txt
+To remove compiled files:
+make clean
