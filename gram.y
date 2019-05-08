@@ -567,11 +567,24 @@ for (std::map<string,varData>::iterator it=sym[sym.size()-1].begin(); it!=sym[sy
 }
 
 
-int main(void) {
+int main( int argc, char *argv[] )  {
+
+    printf("Program name %s\n", argv[0]);
+    
+    if( argc == 2 ) {
+        printf("The argument supplied is %s\n", argv[1]);
+    }
+    else if( argc > 2 ) {
+        printf("Too many arguments supplied.\n");
+    }
+    else {
+        printf("One argument expected.\n");
+        return 0;
+    }
     v.null = true;
     sym.push_back(map<string,varData>());
     extern FILE * yyin;
-    yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
+    yyin = fopen(argv[1], "r"); // The input file for lex, the default is stdin
     yyparse();
     fclose(yyin);
     return 0;
