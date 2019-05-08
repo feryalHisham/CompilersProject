@@ -16,7 +16,7 @@ class Document:
 class Editor:
     def __init__(self, master):
         self.master = master
-        self.master.title("Notepad+=1")
+        self.master.title("CodeAche")
         self.frame = tk.Frame(self.master)
         self.frame.pack()
         
@@ -91,7 +91,7 @@ class Editor:
         first_tab = ttk.Frame(self.nb)
         self.tabs[ first_tab ] = Document( first_tab, self.create_text_widget(first_tab) )
         self.nb.add(first_tab, text='Code')
-        btn = tk.Button(master, text="Compile my Code", command= self.compile_file, bg="orange")
+        btn = tk.Button(master, text="Viola!", command= self.compile_file, bg="orange")
         btn.pack()
 
     def create_text_widget(self, frame):
