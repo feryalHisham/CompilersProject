@@ -64,7 +64,7 @@ vector<pair<int,string>> errors;
 %left '*' '/'
 %nonassoc UMINUS
 
-%type <nPtr> stmt declaration expr stmt_list default_stmt case_stmt switch_stmt
+%type <nPtr> stmt declaration expr stmt_list default_stmt case_stmt switch_stmt initialization
 
 %%
 
@@ -81,10 +81,10 @@ function:
 stmt:	PRINT expr ';'                 { $$ = opr(PRINT, 1, $2); }
 
         | declaration ';'                   { $$ = $1; }
-	    | declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
+	|initialization 		    { $$ = $1;}
         | VARIABLE '=' expr ';'          { $$ = opr('=', 2, id($1,VAR_AS_LVALUE,false), $3); }
         | DO '{' stmt_list '}' WHILE '(' expr ')' ';' { $$ = opr(DO, 2, $3, $7); }
-        | FOR '(' declaration '=' expr ';' expr ';' VARIABLE '=' expr  ')' '{' stmt_list '}'   { $$ = opr(FOR, 4, opr('=', 2, $3, $5), $7, opr('=', 2, id($9,VAR_AS_LVALUE,false), $11), $14); }
+        | FOR '(' initialization expr ';' VARIABLE '=' expr  ')' '{' stmt_list '}'   { $$ = opr(FOR, 4, $3, $4, opr('=', 2, id($6,VAR_AS_LVALUE,false), $8), $11); }
         | WHILE '(' expr ')' '{' stmt_list '}'   { $$ = opr(WHILE, 2, $3, $6); }
         | IF '(' expr ')' '{' stmt_list '}' %prec IFX {   $$ = opr(IF, 2, $3, $6); }
         | IF '(' expr ')' '{' stmt_list '}' ELSE '{' stmt_list '}' {  $$ = opr(IF, 3, $3, $6, $10); }
@@ -109,6 +109,9 @@ declaration:
 			| BOOL_TYPE VARIABLE  { $$ = id($2,typeBool,false);}
 			| CONST BOOL_TYPE VARIABLE  { $$ = id($3,typeBool,true);}
 	          ;
+
+initialization:  declaration '=' expr ';'       {$$ = opr('=', 2, $1, $3);}
+		
 
 expr:
           INTEGER               { $$ = con($1, 0.0, temp, true, typeInt); }
@@ -181,6 +184,7 @@ nodeType *con(int valI,float valF,char* valS,bool valB, conType conT) {
 
 nodeType *id(char *s,conType vType,bool constant) {
     nodeType *p;
+
 
     /* allocate node */
     if ((p = (nodeType *)malloc(sizeof(nodeType))) == NULL)
@@ -535,7 +539,8 @@ void setExprConType(nodeType * p){
 
 void handleAssignment(nodeType *p){
 
-    //check constants
+
+
     char* s = p->opr.op[0]->id.keyName;
 
         string ss(s);
@@ -567,11 +572,18 @@ for (std::map<string,varData>::iterator it=sym[sym.size()-1].begin(); it!=sym[sy
 }
 
 
-int main(void) {
+int main( int argc, char *argv[] )  {
+    if( argc > 2 ) {
+        printf("Too many arguments supplied.\n");
+    }
+    else if( argc < 2 ){
+        printf("One argument expected.\n");
+        return 0;
+    }
     v.null = true;
     sym.push_back(map<string,varData>());
     extern FILE * yyin;
-    yyin = fopen("myProgram.txt", "r"); // The input file for lex, the default is stdin
+    yyin = fopen(argv[1], "r"); // The input file for lex, the default is stdin
     yyparse();
     fclose(yyin);
     return 0;
