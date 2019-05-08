@@ -4,9 +4,8 @@ cmake-build-debug/
 
 
 lex.yy.c
-y.output
-y.tab.c
-y.tab.h
 
 output.txt
 myProgram1.txt
+y.*
+compiler.out
