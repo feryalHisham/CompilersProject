@@ -362,7 +362,8 @@ class Editor:
             except tk.TclError:
                 return
 
-def main(): 
+def main():
+    os.system("make || echo \"Couldn't build the compiler\"") 
     root = tk.Tk()
     app = Editor(root)
     root.mainloop()
