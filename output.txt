@@ -1,3 +1,0 @@
-	push	3
-	pop	x
-line 1: Variable is unused in this scope.
